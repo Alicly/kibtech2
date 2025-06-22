@@ -15,3 +15,4 @@ Pillow==10.0.1
 reportlab==3.6.12
 pdfkit
 whitenoise 
+xhtml2pdf
