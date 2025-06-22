@@ -1,0 +1,225 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">User Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('admin.add_user') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-user-plus"></i> Add New User
+        </a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Students</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <h2 class="text-primary">{{ users|selectattr('role', 'equalto', 'student')|list|length }}</h2>
+                        <p class="text-muted">Total Students</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Staff</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <h2 class="text-success">{{ users|selectattr('role', 'equalto', 'staff')|list|length }}</h2>
+                        <p class="text-muted">Total Staff</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Lecturers</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <h2 class="text-info">{{ users|selectattr('role', 'equalto', 'lecturer')|list|length }}</h2>
+                        <p class="text-muted">Total Lecturers</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="detailsModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle"></h2>
+        <p id="modalContent"></p>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <!-- Filter/Search Form -->
+        <form method="get" class="mb-3">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-2">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ filter_username or '' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="text" class="form-control" id="email" name="email" value="{{ filter_email or '' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="role" class="form-label">Role</label>
+                    <select class="form-select" id="role" name="role">
+                        <option value="">All</option>
+                        <option value="student" {% if filter_role == 'student' %}selected{% endif %}>Student</option>
+                        <option value="lecturer" {% if filter_role == 'lecturer' %}selected{% endif %}>Lecturer</option>
+                        <option value="staff" {% if filter_role == 'staff' %}selected{% endif %}>Staff</option>
+                        <option value="admin" {% if filter_role == 'admin' %}selected{% endif %}>Admin</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="registration_number" class="form-label">Registration Number</label>
+                    <input type="text" class="form-control" id="registration_number" name="registration_number" value="{{ filter_registration_number or '' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="staff_id" class="form-label">Staff ID</label>
+                    <input type="text" class="form-control" id="staff_id" name="staff_id" value="{{ filter_staff_id or '' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="lecturer_id" class="form-label">Lecturer ID</label>
+                    <input type="text" class="form-control" id="lecturer_id" name="lecturer_id" value="{{ filter_lecturer_id or '' }}">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-secondary w-100">Reset</a>
+                </div>
+            </div>
+        </form>
+        <!-- End Filter/Search Form -->
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Registration Number</th>
+                        <th>Staff ID</th>
+                        <th>Lecturer ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.first_name }} {{ user.last_name }}</td>
+                        <td>
+                            <span class="badge {% if user.role == 'admin' %}bg-danger{% elif user.role == 'lecturer' %}bg-primary{% else %}bg-success{% endif %}">
+                                {{ user.role|title }}
+                            </span>
+                        </td>
+                        <td>{% if user.role == 'student' %}{{ user.registration_number or '' }}{% endif %}</td>
+                        <td>{% if user.role == 'staff' %}{{ user.staff_id or '' }}{% endif %}</td>
+                        <td>{% if user.role == 'lecturer' %}{{ user.lecturer_id or '' }}{% endif %}</td>
+                        <td>
+                            <a href="{{ url_for('admin.edit_user', id=user.id) }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form action="{{ url_for('admin.delete_user', id=user.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function showDetails(role) {
+    const modal = document.getElementById('detailsModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    
+    let title, content;
+    switch(role) {
+        case 'students':
+            title = 'Total Students';
+            content = '1';
+            break;
+        case 'staff':
+            title = 'Total Courses';
+            content = '40';
+            break;
+        case 'lecturers':
+            title = 'Active Classes';
+            content = '0';
+            break;
+    }
+    
+    modalTitle.textContent = title;
+    modalContent.textContent = content;
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('detailsModal').style.display = 'none';
+}
+</script>
+
+<style>
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,26 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Maintenance Mode{% endblock %}
+
+{% block admin_content %}
+<div class="container mt-4">
+    <h2>Maintenance Mode</h2>
+    <p>Toggle maintenance mode for the entire system. When ON, only admins can access the system. All other users will see a maintenance message.</p>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.maintenance_mode.label(class="form-label") }}
+            {{ form.maintenance_mode(class="form-select") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+    <div class="mt-3">
+        <strong>Current Status:</strong>
+        {% if current_mode == 'on' %}
+            <span class="badge bg-danger">MAINTENANCE ON</span>
+        {% else %}
+            <span class="badge bg-success">MAINTENANCE OFF</span>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

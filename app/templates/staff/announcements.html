@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Staff Announcements - TVET{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Staff Announcements</h2>
+    <form method="post" class="mb-4">
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Content</label>
+            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Announcement</button>
+    </form>
+    <h4>All Announcements</h4>
+    {% for announcement in announcements %}
+    <div class="card mb-3">
+        <div class="card-header">
+            <strong>{{ announcement.title }}</strong>
+            <span class="text-muted float-end">{{ announcement.created_at.strftime('%Y-%m-%d %H:%M') if announcement.created_at else '' }}</span>
+        </div>
+        <div class="card-body">
+            <p>{{ announcement.content }}</p>
+            {% if announcement.created_by == current_user.id or current_user.role == 'admin' %}
+            <a href="{{ url_for('staff.edit_announcement', id=announcement.id) }}" class="btn btn-sm btn-warning">Edit</a>
+            <form method="post" action="{{ url_for('staff.delete_announcement', id=announcement.id) }}" style="display:inline-block;">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this announcement?');">Delete</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <p>No announcements yet.</p>
+    {% endfor %}
+</div>
+{% endblock %} 

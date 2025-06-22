@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Academic Results - {{ student.first_name }} {{ student.last_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .student-info {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .grade-a { color: #28a745; font-weight: bold; }
+        .grade-b { color: #007bff; font-weight: bold; }
+        .grade-c { color: #ffc107; font-weight: bold; }
+        .grade-d { color: #17a2b8; font-weight: bold; }
+        .grade-f { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>KITELAKPEL TECHNICAL TRAINING INSTITUTE</h1>
+        <h2>Academic Results</h2>
+        <h3>{{ academic_year }} - {{ semester }}</h3>
+    </div>
+
+    <div class="student-info">
+        <p><strong>Student Name:</strong> {{ student.first_name }} {{ student.last_name }}</p>
+        <p><strong>Student Number:</strong> {{ student.student_number }}</p>
+        <p><strong>Course:</strong> {{ student.course.name if student.course else 'N/A' }}</p>
+        <p><strong>Email:</strong> {{ student.email }}</p>
+    </div>
+
+    {% if results %}
+    <table>
+        <thead>
+            <tr>
+                <th>Unit Code</th>
+                <th>Unit Name</th>
+                <th>Score (%)</th>
+                <th>Grade</th>
+                <th>Remarks</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.unit.code if result.unit else 'N/A' }}</td>
+                <td>{{ result.unit.name if result.unit else 'N/A' }}</td>
+                <td>{{ "%.1f"|format(result.score) if result.score is not none else 'N/A' }}</td>
+                <td class="grade-{{ result.grade_letter.lower() if result.grade_letter else 'f' }}">
+                    {{ result.grade_letter if result.grade_letter else 'N/A' }}
+                </td>
+                <td>{{ result.remarks or 'No remarks' }}</td>
+                <td>{{ result.created_at.strftime('%Y-%m-%d') if result.created_at else 'N/A' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Summary Statistics -->
+    <div style="margin-top: 20px;">
+        <h4>Summary</h4>
+        <p><strong>Total Units:</strong> {{ results|length }}</p>
+        <p><strong>Graded Units:</strong> {{ results|selectattr('score')|list|length }}</p>
+        {% set graded_results = results|selectattr('score')|list %}
+        {% if graded_results %}
+            <p><strong>Average Score:</strong> {{ "%.1f"|format(graded_results|sum(attribute='score') / graded_results|length) }}%</p>
+        {% endif %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px;">
+        <h3>No Results Available</h3>
+        <p>No grades have been recorded for this student yet.</p>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+        <p>This is a computer-generated document and does not require a signature.</p>
+        <p>Generated on: {{ current_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    </div>
+</body>
+</html> 

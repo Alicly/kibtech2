@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Alumni & Testimonials - TVET{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Alumni Success Stories</h2>
+    <div class="row">
+        {% for alum in alumni %}
+        <div class="col-md-4 mb-4">
+            <div class="card testimonial-card h-100">
+                {% if alum.photo_url %}
+                <img src="{{ alum.photo_url }}" class="card-img-top" alt="{{ alum.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ alum.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Class of {{ alum.graduation_year }} | {{ alum.course }}</h6>
+                    <p class="quote">"{{ alum.testimonial }}"</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

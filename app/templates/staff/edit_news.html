@@ -1,0 +1,30 @@
+{% extends 'staff/staff_base.html' %}
+{% block title %}Edit News - TVET{% endblock %}
+{% block sidebar %}
+<div class="list-group mb-4">
+    <a href="{{ url_for('staff.dashboard') }}" class="list-group-item list-group-item-action"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="{{ url_for('staff.students') }}" class="list-group-item list-group-item-action"><i class="fas fa-users"></i> Students</a>
+    <a href="{{ url_for('staff.fees') }}" class="list-group-item list-group-item-action"><i class="fas fa-money-bill"></i> Fees</a>
+    <a href="{{ url_for('staff.resources') }}" class="list-group-item list-group-item-action"><i class="fas fa-upload"></i> Resources</a>
+    <a href="{{ url_for('staff.announcements') }}" class="list-group-item list-group-item-action"><i class="fas fa-bullhorn"></i> Announcements</a>
+    <a href="{{ url_for('staff.news') }}" class="list-group-item list-group-item-action active"><i class="fas fa-newspaper"></i> News</a>
+    <a href="{{ url_for('staff.events') }}" class="list-group-item list-group-item-action"><i class="fas fa-calendar"></i> Events</a>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit News</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ news_item.title }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Content</label>
+            <textarea class="form-control" id="content" name="content" rows="3" required>{{ news_item.content }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Update News</button>
+        <a href="{{ url_for('staff.news') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %} 

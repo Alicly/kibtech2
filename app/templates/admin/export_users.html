@@ -1,0 +1,65 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Export Users{% endblock %}
+
+{% block admin_content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Export Users</h2>
+    <form id="exportForm" class="row g-3 align-items-end" method="get">
+        <div class="col-md-4">
+            <label for="role" class="form-label">User Role</label>
+            <select class="form-select" id="role" name="role" required>
+                <option value="">-- Select Role --</option>
+                {% for role in roles %}
+                <option value="{{ role }}">{{ role|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4" id="courseFilter" style="display:none;">
+            <label for="course_id" class="form-label">Course (for Students)</label>
+            <select class="form-select" id="course_id" name="course_id">
+                <option value="">-- All Courses --</option>
+                {% for course in courses %}
+                <option value="{{ course.id }}">{{ course.name }} ({{ course.code }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button type="button" class="btn btn-primary w-100" onclick="exportUsers('pdf')">
+                <i class="fas fa-file-pdf me-2"></i>Export as PDF
+            </button>
+            <button type="button" class="btn btn-success w-100" onclick="exportUsers('csv')">
+                <i class="fas fa-file-csv me-2"></i>Export as CSV
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    const courseFilter = document.getElementById('courseFilter');
+    roleSelect.addEventListener('change', function() {
+        if (this.value === 'student') {
+            courseFilter.style.display = '';
+        } else {
+            courseFilter.style.display = 'none';
+        }
+    });
+});
+
+function exportUsers(format) {
+    const role = document.getElementById('role').value;
+    const courseId = document.getElementById('course_id').value;
+    if (!role) {
+        alert('Please select a user role.');
+        return;
+    }
+    let url = `/admin/export-users-${format}?role=${role}`;
+    if (role === 'student' && courseId) {
+        url += `&course_id=${courseId}`;
+    }
+    window.open(url, '_blank');
+}
+</script>
+{% endblock %} 

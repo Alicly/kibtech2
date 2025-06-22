@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Courses - TVET{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group mb-4">
+            <a href="{{ url_for('staff.dashboard') }}" class="list-group-item list-group-item-action"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{{ url_for('staff.courses') }}" class="list-group-item list-group-item-action active"><i class="fas fa-book"></i> Courses</a>
+            <a href="{{ url_for('staff.students') }}" class="list-group-item list-group-item-action"><i class="fas fa-users"></i> Students</a>
+            <a href="{{ url_for('staff.fees') }}" class="list-group-item list-group-item-action"><i class="fas fa-money-bill"></i> Fees</a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h2 class="mb-4">Courses</h2>
+        <form class="mb-3" method="get" action="{{ url_for('staff.search_courses') }}">
+            <div class="input-group">
+                <input type="text" class="form-control" name="q" placeholder="Search courses..." value="{{ search_query if search_query is defined else '' }}">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </form>
+        {% for course in courses %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">{{ course.name }}</div>
+            <div class="card-body">
+                <p>{{ course.description }}</p>
+                <h5>Modules</h5>
+                <ul>
+                    {% for module in course.modules %}
+                    <li>{{ module.title }}</li>
+                    {% endfor %}
+                </ul>
+                <h5>Enrolled Students</h5>
+                <p>{{ course.enrollments.count() }} students enrolled.</p>
+                <a href="{{ url_for('staff.course_detail', course_id=course.id) }}" class="btn btn-sm btn-primary">View Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

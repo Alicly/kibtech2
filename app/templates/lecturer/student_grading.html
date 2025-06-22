@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Grade Student - Lecturer Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Grade Student</h1>
+        <a href="{{ url_for('lecturer.grading') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Grading
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-user-graduate me-2"></i>Student Details
+        </div>
+        <div class="card-body">
+            <div class="row mb-2">
+                <div class="col-md-4"><strong>Name:</strong> {{ student.first_name }} {{ student.last_name }}</div>
+                <div class="col-md-4"><strong>Email:</strong> {{ student.email }}</div>
+                <div class="col-md-4"><strong>Registration No.:</strong> {{ student.student_number }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4"><strong>Course:</strong> {{ student.course.name if student.course else 'N/A' }}</div>
+                <div class="col-md-4"><strong>Status:</strong> {{ student.status }}</div>
+                <div class="col-md-4"><strong>Gender:</strong> {{ student.gender or 'N/A' }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4"><strong>Phone:</strong> {{ student.phone or 'N/A' }}</div>
+                <div class="col-md-4"><strong>Address:</strong> {{ student.address or 'N/A' }}</div>
+                <div class="col-md-4"><strong>Date of Birth:</strong> {{ student.date_of_birth or 'N/A' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <i class="fas fa-book me-2"></i>Units & Grades
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('lecturer.student_grading', student_id=student.id) }}">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Unit Code</th>
+                                <th>Unit Name</th>
+                                <th>Grade Score</th>
+                                <th>Grade Letter</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for unit in units %}
+                            <tr>
+                                <td><strong>{{ unit.code }}</strong></td>
+                                <td>{{ unit.name }}</td>
+                                <td>
+                                    <input type="number" name="score_{{ unit.id }}" class="form-control" min="0" max="100" step="0.1" value="{{ grades[unit.id].score if grades[unit.id] else '' }}" placeholder="0-100">
+                                </td>
+                                <td>
+                                    {% if grades[unit.id] %}
+                                        <span class="badge bg-{% if grades[unit.id].grade_letter in ['A', 'B'] %}success{% elif grades[unit.id].grade_letter == 'C' %}warning{% else %}danger{% endif %}">
+                                            {{ grades[unit.id].grade_letter }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">Not graded</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <input type="text" name="remarks_{{ unit.id }}" class="form-control" value="{{ grades[unit.id].remarks if grades[unit.id] else '' }}" placeholder="Optional remarks">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-2"></i>Save Grades
+                    </button>
+                    <a href="{{ url_for('lecturer.my_students') }}" class="btn btn-secondary ms-2">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Students
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

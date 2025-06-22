@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Grading - TVET{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group mb-4">
+            <a href="{{ url_for('staff.dashboard') }}" class="list-group-item list-group-item-action"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{{ url_for('staff.courses') }}" class="list-group-item list-group-item-action"><i class="fas fa-book"></i> Courses</a>
+            <a href="{{ url_for('staff.students') }}" class="list-group-item list-group-item-action"><i class="fas fa-users"></i> Students</a>
+            <a href="{{ url_for('staff.grading') }}" class="list-group-item list-group-item-action active"><i class="fas fa-graduation-cap"></i> Grading</a>
+            <a href="{{ url_for('staff.resources') }}" class="list-group-item list-group-item-action"><i class="fas fa-upload"></i> Resources</a>
+            <a href="{{ url_for('staff.announcements') }}" class="list-group-item list-group-item-action"><i class="fas fa-bullhorn"></i> Announcements</a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h2 class="mb-4">Grading</h2>
+        {% for enrollment in enrollments %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">{{ enrollment.course.name }}</div>
+            <div class="card-body">
+                <h5>Student: {{ enrollment.student.first_name }} {{ enrollment.student.last_name }}</h5>
+                <p>Email: {{ enrollment.student.email }}</p>
+                <p>Enrollment Date: {{ enrollment.enrollment_date.strftime('%Y-%m-%d') }}</p>
+                <form>
+                    <div class="form-group">
+                        <label for="grade">Grade</label>
+                        <input type="text" class="form-control" id="grade" placeholder="Enter grade">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Grade</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

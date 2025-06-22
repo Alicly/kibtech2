@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Record - {{ student.first_name }} {{ student.last_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .student-info {
+            margin-bottom: 20px;
+        }
+        .student-info p {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .status-present {
+            color: green;
+        }
+        .status-absent {
+            color: red;
+        }
+        .status-late {
+            color: orange;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>KITELAKAPEL TECHNICAL TRAINING INSTITUTE</h2>
+        <h3>Attendance Record</h3>
+    </div>
+
+    <div class="student-info">
+        <p><strong>Student Name:</strong> {{ student.first_name }} {{ student.last_name }}</p>
+        <p><strong>Student Number:</strong> {{ student.student_number }}</p>
+        <p><strong>Course:</strong> {{ student.course.name if student.course else 'Not assigned' }}</p>
+        <p><strong>Date Generated:</strong> {{ current_date.strftime('%Y-%m-%d') }}</p>
+    </div>
+
+    {% if attendance_records %}
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Class</th>
+                <th>Status</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in attendance_records %}
+            <tr>
+                <td>{{ record.date.strftime('%Y-%m-%d') if record.date else 'N/A' }}</td>
+                <td>{{ record.class_room.room_number if record.class_room else 'N/A' }}</td>
+                <td class="status-{{ record.status }}">
+                    {{ record.status|title if record.status else 'N/A' }}
+                </td>
+                <td>{{ record.remarks or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No attendance records available.</p>
+    {% endif %}
+
+    <div class="summary">
+        <h4>Summary</h4>
+        <p><strong>Total Classes:</strong> {{ total_sessions }}</p>
+        <p><strong>Present:</strong> {{ present_count }}</p>
+        <p><strong>Absent:</strong> {{ absent_count }}</p>
+        <p><strong>Late:</strong> {{ late_count }}</p>
+        <p><strong>Attendance Rate:</strong> {{ "%.1f"|format(attendance_rate) }}%</p>
+    </div>
+
+    <div class="footer">
+        <p>This is a computer-generated record and does not require a signature.</p>
+    </div>
+
+    <div class="no-print" style="margin-top: 20px; text-align: center;">
+        <button onclick="window.print()">Print Attendance Record</button>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Notifications</h4>
+                    {% if notifications.items %}
+                    <form action="{{ url_for('main.mark_all_notifications_read') }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-light btn-sm">Mark All as Read</button>
+                    </form>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if notifications.items %}
+                        {% for notification in notifications.items %}
+                        <div class="notification-item mb-3 p-3 {% if not notification.is_read %}bg-light{% endif %}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="mb-1">{{ notification.title }}</h5>
+                                    <p class="mb-1">{{ notification.message }}</p>
+                                    <small class="text-muted">{{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </div>
+                                {% if not notification.is_read %}
+                                <form action="{{ url_for('main.mark_notification_read', id=notification.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Mark as Read</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            {% if notification.type in ['news', 'event'] %}
+                            <div class="mt-2">
+                                <a href="{{ url_for('main.news_details', news_id=notification.related_id) if notification.type == 'news' else url_for('main.event_details', event_id=notification.related_id) }}" 
+                                   class="btn btn-sm btn-link">
+                                    View Details
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- Pagination -->
+                        {% if notifications.pages > 1 %}
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                {% for page in notifications.iter_pages() %}
+                                    {% if page %}
+                                        <li class="page-item {% if page == notifications.page %}active{% endif %}">
+                                            <a class="page-link" href="{{ url_for('main.notifications', page=page) }}">{{ page }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="mb-0">No notifications yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Course Detail - TVET{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group mb-4">
+            <a href="{{ url_for('staff.dashboard') }}" class="list-group-item list-group-item-action"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{{ url_for('staff.courses') }}" class="list-group-item list-group-item-action active"><i class="fas fa-book"></i> Courses</a>
+            <a href="{{ url_for('staff.students') }}" class="list-group-item list-group-item-action"><i class="fas fa-users"></i> Students</a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h2 class="mb-4">{{ course.name }}</h2>
+        <p>{{ course.description }}</p>
+        <h4>Modules</h4>
+        <ul>
+            {% for module in course.modules %}
+            <li>{{ module.title }}</li>
+            {% endfor %}
+        </ul>
+        <h4>Enrolled Students</h4>
+        <ul>
+            {% for student in students %}
+            <li>{{ student.first_name }} {{ student.last_name }} ({{ student.email }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %} 

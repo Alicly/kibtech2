@@ -1,0 +1,49 @@
+{% extends 'staff/staff_base.html' %}
+{% block title %}Staff News - TVET{% endblock %}
+{% block sidebar %}
+<div class="list-group mb-4">
+    <a href="{{ url_for('staff.dashboard') }}" class="list-group-item list-group-item-action"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="{{ url_for('staff.students') }}" class="list-group-item list-group-item-action"><i class="fas fa-users"></i> Students</a>
+    <a href="{{ url_for('staff.fees') }}" class="list-group-item list-group-item-action"><i class="fas fa-money-bill"></i> Fees</a>
+    <a href="{{ url_for('staff.resources') }}" class="list-group-item list-group-item-action"><i class="fas fa-upload"></i> Resources</a>
+    <a href="{{ url_for('staff.announcements') }}" class="list-group-item list-group-item-action"><i class="fas fa-bullhorn"></i> Announcements</a>
+    <a href="{{ url_for('staff.news') }}" class="list-group-item list-group-item-action active"><i class="fas fa-newspaper"></i> News</a>
+    <a href="{{ url_for('staff.events') }}" class="list-group-item list-group-item-action"><i class="fas fa-calendar"></i> Events</a>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Staff News</h2>
+    <form method="post" class="mb-4">
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Content</label>
+            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post News</button>
+    </form>
+    <h4>All News</h4>
+    {% for news in news_list %}
+    <div class="card mb-3">
+        <div class="card-header">
+            <strong>{{ news.title }}</strong>
+            <span class="text-muted float-end">{{ news.created_at.strftime('%Y-%m-%d %H:%M') if news.created_at else '' }}</span>
+        </div>
+        <div class="card-body">
+            <p>{{ news.content }}</p>
+            {% if news.created_by == current_user.id or current_user.role == 'admin' %}
+            <a href="{{ url_for('staff.edit_news', id=news.id) }}" class="btn btn-sm btn-warning">Edit</a>
+            <form method="post" action="{{ url_for('staff.delete_news', id=news.id) }}" style="display:inline-block;">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this news?');">Delete</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <p>No news yet.</p>
+    {% endfor %}
+</div>
+{% endblock %} 

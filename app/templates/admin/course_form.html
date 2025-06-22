@@ -1,0 +1,234 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ title }}</h1>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            
+            <!-- Basic Information -->
+            <h5 class="text-primary mb-3">Basic Information</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.code.label(class="form-label") }}
+                        {{ form.code(class="form-control") }}
+                        {% if form.code.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.code.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.name.label(class="form-label") }}
+                        {{ form.name(class="form-control") }}
+                        {% if form.name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.name.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.duration.label(class="form-label") }}
+                        {{ form.duration(class="form-control", placeholder="e.g., 2 years, 6 months") }}
+                        {% if form.duration.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.duration.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.level.label(class="form-label") }}
+                        {{ form.level(class="form-control", placeholder="e.g., Certificate, Diploma") }}
+                        {% if form.level.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.level.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.category.label(class="form-label") }}
+                        {{ form.category(class="form-control", placeholder="e.g., ICT, Engineering, Construction") }}
+                        {% if form.category.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.category.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.capacity.label(class="form-label") }}
+                        {{ form.capacity(class="form-control", placeholder="Maximum number of students") }}
+                        {% if form.capacity.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.capacity.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fee Information -->
+            <h5 class="text-primary mb-3 mt-4">Fee Information</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.fee.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text">KES</span>
+                            {{ form.fee(class="form-control", placeholder="e.g. 50000", min="0") }}
+                        </div>
+                        <small class="form-text text-muted">Enter the total course fee.</small>
+                        {% if form.fee.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.fee.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <div class="form-check">
+                            {{ form.is_active(class="form-check-input") }}
+                            {{ form.is_active.label(class="form-check-label") }}
+                        </div>
+                        {% if form.is_active.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.is_active.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <h5 class="text-primary mb-3 mt-4">Additional Information</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.entry_requirements.label(class="form-label") }}
+                        {{ form.entry_requirements(class="form-control", placeholder="e.g., KCSE C- and above") }}
+                        {% if form.entry_requirements.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.entry_requirements.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form.exam_body.label(class="form-label") }}
+                        {{ form.exam_body(class="form-control", placeholder="e.g., TVET-CDACC, KNEC") }}
+                        {% if form.exam_body.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.exam_body.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <div class="form-group">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control", rows=4, placeholder="Detailed course description...") }}
+                        {% if form.description.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.description.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <div class="form-group">
+                        {{ form.lecturer_id.label(class="form-label") }}
+                        {{ form.lecturer_id(class="form-select") }}
+                        {% if form.lecturer_id.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.lecturer_id.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <div class="form-group">
+                        {{ form.image.label(class="form-label") }}
+                        {{ form.image(class="form-control", accept="image/*") }}
+                        <small class="form-text text-muted">Upload a course image (JPG, PNG, GIF). Recommended size: 800x600 pixels.</small>
+                        {% if form.image.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.image.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> {{ 'Update Course' if course else 'Save Course' }}
+                    </button>
+                    <a href="{{ url_for('admin.courses') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

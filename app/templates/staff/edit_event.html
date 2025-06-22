@@ -1,0 +1,42 @@
+{% extends 'staff/staff_base.html' %}
+{% block title %}Edit Event - TVET{% endblock %}
+{% block sidebar %}
+<div class="list-group mb-4">
+    <a href="{{ url_for('staff.dashboard') }}" class="list-group-item list-group-item-action"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="{{ url_for('staff.students') }}" class="list-group-item list-group-item-action"><i class="fas fa-users"></i> Students</a>
+    <a href="{{ url_for('staff.fees') }}" class="list-group-item list-group-item-action"><i class="fas fa-money-bill"></i> Fees</a>
+    <a href="{{ url_for('staff.resources') }}" class="list-group-item list-group-item-action"><i class="fas fa-upload"></i> Resources</a>
+    <a href="{{ url_for('staff.announcements') }}" class="list-group-item list-group-item-action"><i class="fas fa-bullhorn"></i> Announcements</a>
+    <a href="{{ url_for('staff.news') }}" class="list-group-item list-group-item-action"><i class="fas fa-newspaper"></i> News</a>
+    <a href="{{ url_for('staff.events') }}" class="list-group-item list-group-item-action active"><i class="fas fa-calendar"></i> Events</a>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Event</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ event.title }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" required>{{ event.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" name="date" value="{{ event.date }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="time" class="form-label">Time</label>
+            <input type="time" class="form-control" id="time" name="time" value="{{ event.time.strftime('%H:%M') if event.time else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" name="location" value="{{ event.location }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Event</button>
+        <a href="{{ url_for('staff.events') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %} 

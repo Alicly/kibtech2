@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Lecturer Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Class Reports</h1>
+        <div>
+            <button type="button" class="btn btn-outline-primary me-2" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>Print Reports
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exportModal">
+                <i class="fas fa-download me-2"></i>Export Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Attendance Statistics -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Attendance Statistics</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for class_name, attendance_rate in attendance_stats.items() %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ class_name }}</h6>
+                            <div class="progress mb-3">
+                                <div class="progress-bar" role="progressbar" style="width: {{ attendance_rate }}%"
+                                     aria-valuenow="{{ attendance_rate }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ attendance_rate }}%
+                                </div>
+                            </div>
+                            <p class="card-text text-muted">Average Attendance Rate</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Grade Distribution -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Grade Distribution</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Assignment</th>
+                            <th>Average</th>
+                            <th>Highest</th>
+                            <th>Lowest</th>
+                            <th>Distribution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assignment, stats in grade_distribution.items() %}
+                        <tr>
+                            <td>{{ assignment }}</td>
+                            <td>{{ "%.1f"|format(stats.average) }}</td>
+                            <td>{{ stats.highest }}</td>
+                            <td>{{ stats.lowest }}</td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-success" style="width: {{ (stats.average / 100) * 100 }}%">
+                                        {{ "%.1f"|format(stats.average) }}%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Class Performance -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Class Performance</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for class_name, performance in class_performance.items() %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ class_name }}</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <h3 class="mb-1">{{ "%.1f"|format(performance.average) }}</h3>
+                                        <p class="text-muted mb-0">Average Grade</p>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <h3 class="mb-1">{{ "%.1f"|format(performance.passing_rate) }}%</h3>
+                                        <p class="text-muted mb-0">Passing Rate</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ performance.passing_rate }}%"
+                                     aria-valuenow="{{ performance.passing_rate }}" 
+                                     aria-valuemin="0" aria-valuemax="100">
+                                    {{ "%.1f"|format(performance.passing_rate) }}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Export Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <a href="{{ url_for('lecturer.export_attendance') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-clipboard-check me-2"></i>Export Attendance Data
+                    </a>
+                    <a href="{{ url_for('lecturer.export_grades') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-star me-2"></i>Export Grade Data
+                    </a>
+                    <a href="{{ url_for('lecturer.export_performance') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-chart-line me-2"></i>Export Performance Reports
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any JavaScript functionality here if needed
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,691 @@
+{% extends "base.html" %}
+
+{% block title %}Home - KITELAKAPEL TECHNICAL TRAINING INSTITUTE{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section position-relative" style="background: linear-gradient(135deg, #5c6bc0, #7986cb);">
+    {% if config.get('HERO_BACKGROUND') %}
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('{{ url_for('static', filename='uploads/' + config.get('HERO_BACKGROUND')) }}') center/cover; opacity: 0.3;"></div>
+    {% endif %}
+    <div class="container position-relative">
+        <div class="row min-vh-25 align-items-center">
+            <div class="col-lg-6 text-white">
+                <h1 class="display-5 fw-bold mb-3">{{ config.get('HERO_TITLE', 'Empowering Kenya\'s Future Through Technical Education') }}</h1>
+                <p class="lead mb-3">{{ config.get('HERO_SUBTITLE', 'Building a skilled workforce for Kenya\'s development through quality technical and vocational education at KITELAKAPEL TECHNICAL TRAINING INSTITUTE.') }}</p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('main.programs') }}" class="btn btn-light btn-lg">Explore Programs</a>
+                    <a href="{{ url_for('main.contact') }}" class="btn btn-outline-light btn-lg">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="position-absolute top-0 end-0 bottom-0 start-0" style="opacity: 0.1; pointer-events: none;">
+        {% for i in range(30) %}
+            <div class="position-absolute" style="
+                top: {{ (i * 7) % 100 }}%;
+                left: {{ (i * 13) % 100 }}%;
+                transform: rotate({{ i * 12 }}deg);
+            ">
+                {% if i % 5 == 0 %}
+                    <i class="fas fa-graduation-cap fa-2x text-white"></i>
+                {% elif i % 5 == 1 %}
+                    <i class="fas fa-book fa-2x text-white"></i>
+                {% elif i % 5 == 2 %}
+                    <i class="fas fa-flask fa-2x text-white"></i>
+                {% elif i % 5 == 3 %}
+                    <i class="fas fa-tools fa-2x text-white"></i>
+                {% else %}
+                    <i class="fas fa-laptop-code fa-2x text-white"></i>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Key Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Quality Education</h3>
+                        <p class="text-muted mb-0">Industry-aligned programs designed to meet Kenya's technical workforce needs.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-tools fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Practical Training</h3>
+                        <p class="text-muted mb-0">Hands-on experience with modern equipment and industry-standard tools.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-handshake fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Industry Partnerships</h3>
+                        <p class="text-muted mb-0">Strong connections with leading industries for internships and job placements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Programs Section -->
+<section class="py-5 featured-programs-section">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="section-title">Featured Programs</h2>
+                <p class="text-muted">Explore our industry-leading technical and vocational programs</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for course in featured_courses %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    {% if course.image_url %}
+                    <img src="{{ url_for('static', filename='uploads/' + course.image_url) }}" class="card-img-top" alt="{{ course.name }}">
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <h3 class="h5 mb-3">{{ course.name }}</h3>
+                        <p class="text-muted mb-3">{{ course.description|truncate(100) }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary">{{ course.category }}</span>
+                            <a href="{{ url_for('main.course_details', course_id=course.id) }}" class="btn btn-outline-primary">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.programs') }}" class="btn btn-primary">View All Programs</a>
+        </div>
+    </div>
+</section>
+
+<!-- Image Slideshow Section -->
+<section class="py-5 slideshow-section">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="section-title">Campus Life & Facilities</h2>
+                <p class="text-muted">Take a virtual tour of our modern campus and state-of-the-art facilities</p>
+            </div>
+        </div>
+        
+        <div class="slideshow-container">
+            <div class="slideshow-wrapper">
+                {% if slideshow_slides %}
+                    {% for slide in slideshow_slides %}
+                    <div class="slide {% if loop.first %}active{% endif %}">
+                        <div class="slide-image">
+                            <img src="{{ url_for('static', filename='uploads/' + slide.image_url) }}" alt="{{ slide.title }}">
+                        </div>
+                        <div class="slide-message">
+                            <h4>{{ slide.title }}</h4>
+                            <p>{{ slide.description }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Default slides if no slides are configured -->
+                    <div class="slide active">
+                        <div class="slide-image">
+                            <img src="{{ url_for('static', filename='uploads/OIP-removebg-preview.png') }}" alt="Campus Building">
+                        </div>
+                        <div class="slide-message">
+                            <h4>Modern Campus Infrastructure</h4>
+                            <p>State-of-the-art facilities designed for optimal learning experience</p>
+                        </div>
+                    </div>
+                    
+                    <div class="slide">
+                        <div class="slide-image">
+                            <img src="{{ url_for('static', filename='uploads/5960819054254081843.jpg') }}" alt="Students in Lab">
+                        </div>
+                        <div class="slide-message">
+                            <h4>Hands-on Practical Training</h4>
+                            <p>Students working with industry-standard equipment and tools</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Navigation arrows -->
+            <button class="slideshow-nav prev" onclick="changeSlide(-1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="slideshow-nav next" onclick="changeSlide(1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <!-- Dots indicator -->
+            <div class="slideshow-dots">
+                {% if slideshow_slides %}
+                    {% for slide in slideshow_slides %}
+                    <span class="dot {% if loop.first %}active{% endif %}" onclick="currentSlide({{ loop.index }})"></span>
+                    {% endfor %}
+                {% else %}
+                    <span class="dot active" onclick="currentSlide(1)"></span>
+                    <span class="dot" onclick="currentSlide(2)"></span>
+                {% endif %}
+            </div>
+            
+            <!-- Debug info -->
+            <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px; font-size: 12px; border-radius: 3px; z-index: 20;">
+                Slides: <span id="slide-count">0</span> | Auto: <span id="auto-status">Off</span>
+                <button onclick="testSlideshow()" style="margin-left: 10px; padding: 2px 5px; font-size: 10px;">Test</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="section-title mb-4">Why Choose KITELAKAPEL TECHNICAL TRAINING INSTITUTE?</h2>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <div class="feature-icon me-3">
+                                <i class="fas fa-check-circle text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 mb-2">Industry-Ready Skills</h4>
+                                <p class="text-muted small">Practical training aligned with industry needs</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <div class="feature-icon me-3">
+                                <i class="fas fa-check-circle text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 mb-2">Expert Instructors</h4>
+                                <p class="text-muted small">Learn from experienced professionals</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <div class="feature-icon me-3">
+                                <i class="fas fa-check-circle text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 mb-2">Modern Facilities</h4>
+                                <p class="text-muted small">State-of-the-art equipment and labs</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start">
+                            <div class="feature-icon me-3">
+                                <i class="fas fa-check-circle text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 mb-2">Job Placement</h4>
+                                <p class="text-muted small">Career support and industry connections</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="ratio ratio-16x9">
+                    {% if config.get('CAMPUS_IMAGE') %}
+                    <img src="{{ url_for('static', filename='uploads/' + config.get('CAMPUS_IMAGE')) }}" 
+                         alt="{{ config.get('INSTITUTE_NAME', 'KITELAKAPEL Technical Training Institute') }} Campus" 
+                         class="rounded shadow">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/tvet-campus.jpg') }}" 
+                         alt="KITELAKAPEL Technical Training Institute Campus" 
+                         class="rounded shadow">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest News Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="section-title">Latest News</h2>
+                <p class="text-muted">Stay updated with our latest news and announcements</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for item in news %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    {% if item.image_url %}
+                    <img src="{{ item.image_url }}" class="card-img-top" alt="{{ item.title }}">
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-secondary">{{ item.category }}</span>
+                            <small class="text-muted">{{ item.date.strftime('%B %d, %Y') }}</small>
+                        </div>
+                        <h3 class="h5 mb-3">{{ item.title }}</h3>
+                        <p class="text-muted mb-3">{{ item.content|truncate(100) }}</p>
+                        <a href="{{ url_for('main.news_details', news_id=item.id) }}" class="btn btn-link text-primary p-0">Read More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Events Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="section-title">Upcoming Events</h2>
+                <p class="text-muted">Join our upcoming events and workshops</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for event in events %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-primary">{{ event.category }}</span>
+                            <small class="text-muted">{{ event.date.strftime('%B %d, %Y') }}</small>
+                        </div>
+                        <h3 class="h5 mb-3">{{ event.title }}</h3>
+                        <p class="text-muted mb-3">{{ event.description|truncate(100) }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}</small>
+                            <a href="{{ url_for('main.event_details', event_id=event.id) }}" class="btn btn-outline-primary">Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <h2 class="mb-3">Ready to Start Your Technical Career?</h2>
+                <p class="lead mb-0">Join our institution and become part of Kenya's skilled workforce.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{{ url_for('main.contact') }}" class="btn btn-light btn-lg">Apply Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ url_for("static", filename="images/hero-bg.jpg") }}');
+        background-size: cover;
+        background-position: center;
+        min-height: 75vh;
+    }
+
+    .section-title {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -10px;
+        transform: translateX(-50%);
+        width: 50px;
+        height: 3px;
+        background-color: var(--bs-primary);
+    }
+
+    .feature-icon {
+        color: var(--bs-primary);
+    }
+
+    .card {
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .btn-primary {
+        background-color: #1a237e;
+        border-color: #1a237e;
+    }
+
+    .btn-primary:hover {
+        background-color: #0d1642;
+        border-color: #0d1642;
+    }
+
+    .btn-outline-primary {
+        color: #1a237e;
+        border-color: #1a237e;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #1a237e;
+        border-color: #1a237e;
+    }
+
+    .text-primary {
+        color: #1a237e !important;
+    }
+
+    .bg-primary {
+        background-color: #1a237e !important;
+    }
+
+    /* Slideshow Styles */
+    .slideshow-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    .slideshow-container {
+        position: relative;
+        max-width: 800px;
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .slideshow-wrapper {
+        position: relative;
+        width: 100%;
+        height: 350px;
+    }
+
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.8s ease-in-out;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    .slide-image {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .slide-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .slide:hover .slide-image img {
+        transform: scale(1.05);
+    }
+
+    .slide-message {
+        background: linear-gradient(135deg, rgba(26, 35, 126, 0.9), rgba(92, 107, 192, 0.9));
+        color: white;
+        padding: 15px;
+        text-align: center;
+        position: relative;
+    }
+
+    .slide-message h4 {
+        margin: 0 0 8px 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .slide-message p {
+        margin: 0;
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+
+    /* Navigation Arrows */
+    .slideshow-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        color: #1a237e;
+    }
+
+    .slideshow-nav:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .slideshow-nav.prev {
+        left: 15px;
+    }
+
+    .slideshow-nav.next {
+        right: 15px;
+    }
+
+    /* Dots Indicator */
+    .slideshow-dots {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dot.active,
+    .dot:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: scale(1.2);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .slideshow-wrapper {
+            height: 280px;
+        }
+        
+        .slide-message {
+            padding: 12px;
+        }
+        
+        .slide-message h4 {
+            font-size: 1rem;
+        }
+        
+        .slide-message p {
+            font-size: 0.8rem;
+        }
+        
+        .slideshow-nav {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<script>
+// Global variables
+let currentSlideIndex = 0;
+let slideshowInterval = null;
+let slides = [];
+let dots = [];
+
+// Initialize slideshow when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing slideshow...');
+    initializeSlideshow();
+});
+
+function initializeSlideshow() {
+    // Get slides and dots
+    slides = document.querySelectorAll('.slideshow-container .slide');
+    dots = document.querySelectorAll('.slideshow-container .dot');
+    
+    console.log('Found slides:', slides.length);
+    console.log('Found dots:', dots.length);
+    
+    // Update debug info
+    const slideCountElement = document.getElementById('slide-count');
+    const autoStatusElement = document.getElementById('auto-status');
+    
+    if (slideCountElement) slideCountElement.textContent = slides.length;
+    
+    if (slides.length === 0) {
+        console.log('No slides found');
+        if (autoStatusElement) autoStatusElement.textContent = 'No slides';
+        return;
+    }
+
+    // Show first slide
+    showSlide(0);
+    
+    // Start auto-advance if there are multiple slides
+    if (slides.length > 1) {
+        startAutoAdvance();
+        if (autoStatusElement) autoStatusElement.textContent = 'On';
+    } else {
+        if (autoStatusElement) autoStatusElement.textContent = 'Off';
+    }
+    
+    console.log(`Slideshow initialized with ${slides.length} slides`);
+    }
+    
+    function showSlide(index) {
+    console.log('Showing slide:', index);
+    
+    // Hide all slides and dots
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+    // Show current slide and dot
+        if (slides[index]) {
+            slides[index].classList.add('active');
+        }
+        if (dots[index]) {
+            dots[index].classList.add('active');
+        }
+    
+    currentSlideIndex = index;
+    }
+
+    function changeSlide(direction) {
+    console.log('Changing slide by:', direction);
+    
+    let newIndex = currentSlideIndex + direction;
+        
+    // Handle wrapping
+    if (newIndex >= slides.length) {
+        newIndex = 0;
+        }
+    if (newIndex < 0) {
+        newIndex = slides.length - 1;
+        }
+        
+    showSlide(newIndex);
+    }
+
+    function currentSlide(index) {
+    showSlide(index - 1);
+}
+
+function startAutoAdvance() {
+    // Clear existing interval
+    if (slideshowInterval) {
+        clearInterval(slideshowInterval);
+    }
+
+    // Start new interval
+    console.log('Starting auto-advance every 8 seconds');
+    slideshowInterval = setInterval(() => {
+        console.log('Auto-advancing slide...');
+        changeSlide(1);
+    }, 8000);
+}
+
+function testSlideshow() {
+    console.log('=== Slideshow Test ===');
+    console.log('Current slide index:', currentSlideIndex);
+    console.log('Total slides:', slides.length);
+    console.log('Interval active:', slideshowInterval ? 'Yes' : 'No');
+    console.log('Active slide element:', document.querySelector('.slide.active'));
+    
+    if (slides.length > 1) {
+            changeSlide(1);
+        alert('Test: Moved to next slide. Check console for details.');
+    } else {
+        alert('Only one slide available. Cannot test auto-advance.');
+    }
+}
+
+// Make functions globally available
+window.changeSlide = changeSlide;
+window.currentSlide = currentSlide;
+window.testSlideshow = testSlideshow;
+</script>
+{% endblock %} 

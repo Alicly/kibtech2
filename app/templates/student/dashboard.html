@@ -1,0 +1,617 @@
+{% extends "student/student_base.html" %}
+
+{% block title %}Student Dashboard - KITELAKAPEL TECHNICAL TRAINING INSTITUTE{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 100;
+        padding: 48px 0 0;
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+        background-color: #f8f9fa;
+    }
+    
+    .sidebar-sticky {
+        position: relative;
+        top: 0;
+        height: calc(100vh - 48px);
+        padding-top: .5rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
+    .main-content {
+        margin-left: 240px;
+        padding: 20px;
+    }
+    
+    .result-slip {
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #fff;
+    }
+    
+    .result-slip-header {
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+    }
+    
+    .fee-structure-table th {
+        background-color: #f8f9fa;
+    }
+    
+    .unit-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #fff;
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .unit-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .unit-code {
+        font-weight: bold;
+        color: #007bff;
+        font-size: 1.1em;
+    }
+    
+    .unit-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .unit-description {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+    }
+    
+    .unit-credits {
+        background-color: #f8f9fa;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        color: #495057;
+    }
+    
+    @media print {
+        .no-print {
+            display: none;
+        }
+        .result-slip {
+            border: none;
+            padding: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block sidebar %}
+<div class="text-center mb-4">
+    <div class="card text-center">
+        <div class="card-body">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Institute Logo" class="img-fluid mb-2" style="max-width: 100px;">
+            <h4>KITELAKAPEL TECHNICAL TRAINING INSTITUTE</h4>
+            <p class="text-muted">Student Portal</p>
+        </div>
+    </div>
+</div>
+
+<ul class="list-group list-group-flush">
+    <li class="list-group-item {{ 'active' if not active_tab or active_tab == 'dashboard' else '' }}">
+        <a href="{{ url_for('student.dashboard') }}" class="text-decoration-none {{ 'text-white' if not active_tab or active_tab == 'dashboard' else 'text-dark' }}">
+        <i class="fas fa-home me-2"></i>Overview
+    </a>
+    </li>
+    <li class="list-group-item {{ 'active' if active_tab == 'profile' else '' }}">
+        <a href="{{ url_for('student.profile') }}" class="text-decoration-none {{ 'text-white' if active_tab == 'profile' else 'text-dark' }}">
+            <i class="fas fa-user me-2"></i>Profile
+        </a>
+    </li>
+    <li class="list-group-item {{ 'active' if active_tab == 'units' else '' }}">
+        <a href="{{ url_for('student.units') }}" class="text-decoration-none {{ 'text-white' if active_tab == 'units' else 'text-dark' }}">
+        <i class="fas fa-book me-2"></i>My Courses
+    </a>
+    </li>
+    <li class="list-group-item {{ 'active' if active_tab == 'fees' else '' }}">
+        <a href="{{ url_for('student.fees') }}" class="text-decoration-none {{ 'text-white' if active_tab == 'fees' else 'text-dark' }}">
+            <i class="fas fa-money-bill me-2"></i>Fees & Payments
+        </a>
+    </li>
+    <li class="list-group-item {{ 'active' if active_tab == 'results' else '' }}">
+        <a href="{{ url_for('student.results') }}" class="text-decoration-none {{ 'text-white' if active_tab == 'results' else 'text-dark' }}">
+            <i class="fas fa-chart-bar me-2"></i>Results
+        </a>
+    </li>
+    <li class="list-group-item {{ 'active' if active_tab == 'reports' else '' }}">
+        <a href="{{ url_for('student.reports') }}" class="text-decoration-none {{ 'text-white' if active_tab == 'reports' else 'text-dark' }}">
+            <i class="fas fa-file-alt me-2"></i>Reports
+        </a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    {% if not active_tab or active_tab == 'dashboard' %}
+    <!-- Overview Dashboard -->
+            <div class="row g-4">
+                <!-- Quick Stats -->
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h6 class="card-title">Current Courses</h6>
+                    <h2 class="mb-0">{{ courses|length if courses else 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h6 class="card-title">Pending Assignments</h6>
+                    <h2 class="mb-0">{{ pending_assignments|length if pending_assignments else 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h6 class="card-title">Attendance Rate</h6>
+                    <h2 class="mb-0">{{ "%.0f"|format(attendance_rate) if attendance_rate else 0 }}%</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h6 class="card-title">Average Grade</h6>
+                    <h2 class="mb-0">{{ "%.1f"|format(average_grade) if average_grade else 0 }}</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Schedule -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Today's Schedule</h5>
+                    {% if today_schedule %}
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                    <th>Unit</th>
+                                            <th>Room</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for schedule in today_schedule %}
+                                        <tr>
+                                    <td>{{ schedule.start_time }} - {{ schedule.end_time }}</td>
+                                    <td>{{ schedule.unit }}</td>
+                                            <td>{{ schedule.room }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No classes scheduled for today.
+                    </div>
+                    {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+        <!-- Fee Balance -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                    <h5 class="card-title mb-4">Fee Balance</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="card-title">Current Balance</h6>
+                            <h3 class="text-{{ 'danger' if fee_balance > 0 else 'success' }}">
+                                Ksh {{ "%.2f"|format(fee_balance) if fee_balance else 0 }}
+                            </h3>
+                                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ url_for('student.fees') }}" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% elif active_tab == 'profile' %}
+    <!-- Profile Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Student Profile</h5>
+                </div>
+                <div class="card-body">
+                    {% if student %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Student Number:</strong> {{ student.student_number }}</p>
+                            <p><strong>Name:</strong> {{ student.first_name }} {{ student.last_name }}</p>
+                            <p><strong>Email:</strong> {{ student.email }}</p>
+                            <p><strong>Phone:</strong> {{ student.phone or 'Not provided' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Course:</strong> {{ student.course.name if student.course else 'Not assigned' }}</p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge bg-{{ 'success' if student.status == 'active' else 'warning' }}">
+                                    {{ student.status|title }}
+                                </span>
+                            </p>
+                            <p><strong>Enrollment Date:</strong> {{ student.created_at.strftime('%B %d, %Y') if student.created_at else 'Not available' }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        Student profile not found. Please contact the administrator.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% elif active_tab == 'units' %}
+    <!-- Units Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book me-2"></i>
+                        My Course Units - {{ student.course.name if student and student.course else 'Course Not Assigned' }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if student and student.course and units %}
+                    <div class="row">
+                        {% for unit in units %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="unit-card">
+                                <div class="unit-code">{{ unit.code }}</div>
+                                <div class="unit-name">{{ unit.name }}</div>
+                                <div class="unit-description">{{ unit.description }}</div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="unit-credits">{{ unit.credits }} Credits</span>
+                                    <span class="badge bg-primary">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Total Units:</strong> {{ units|length }} | 
+                            <strong>Total Credits:</strong> {{ units|sum(attribute='credits') }}
+                        </div>
+                    </div>
+                    {% elif student and student.course %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        No units have been assigned to your course yet. Please contact your course coordinator.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        You are not enrolled in any course. Please contact the administration.
+                    </div>
+                    {% endif %}
+
+                    {% if lecturers and lecturers|length > 0 %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fas fa-chalkboard-teacher me-2"></i>Lecturers for this Course
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        {% for lecturer in lecturers %}
+                                        <li class="list-group-item">
+                                            <strong>{{ lecturer.first_name }} {{ lecturer.last_name }}</strong>
+                                            <span class="text-muted">({{ lecturer.email }})</span>
+                                            {% if lecturer.department %}<span class="badge bg-secondary ms-2">{{ lecturer.department }}</span>{% endif %}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% elif active_tab == 'fees' %}
+    <!-- Fees Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-money-bill me-2"></i>
+                        Fees & Payments
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Current Balance</h6>
+                            <h3 class="text-{{ 'danger' if fee_balance > 0 else 'success' }}">
+                                Ksh {{ "%.2f"|format(fee_balance) if fee_balance else 0 }}
+                            </h3>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ url_for('student.fees') }}" class="btn btn-primary">View Full Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% elif active_tab == 'results' %}
+    <!-- Results Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Academic Results
+                    </h5>
+                    <div>
+                        <a href="{{ url_for('student.download_results') }}" class="btn btn-success btn-sm me-2">
+                            <i class="fas fa-download me-1"></i>Download CSV
+                        </a>
+                        <a href="{{ url_for('student.download_results_pdf') }}" class="btn btn-primary btn-sm" target="_blank">
+                            <i class="fas fa-file-pdf me-1"></i>Download PDF
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Grade Statistics -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-primary">{{ graded_units }}</h4>
+                                <small class="text-muted">Graded Units</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-success">{{ "%.1f"|format(average_score) }}%</h4>
+                                <small class="text-muted">Average Score</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-info">{{ total_units }}</h4>
+                                <small class="text-muted">Total Units</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-warning">{{ "%.0f"|format((graded_units / total_units * 100) if total_units > 0 else 0) }}%</h4>
+                                <small class="text-muted">Completion Rate</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grade Distribution -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h6>Grade Distribution</h6>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-success fs-6">{{ grade_distribution.A }}</span>
+                                        <div><small>A (80-100%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-primary fs-6">{{ grade_distribution.B }}</span>
+                                        <div><small>B (70-79%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-warning fs-6">{{ grade_distribution.C }}</span>
+                                        <div><small>C (60-69%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-info fs-6">{{ grade_distribution.D }}</span>
+                                        <div><small>D (50-59%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-danger fs-6">{{ grade_distribution.F }}</span>
+                                        <div><small>F (0-49%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-secondary fs-6">{{ ungraded_units|length }}</span>
+                                        <div><small>Pending</small></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grades Table -->
+                    {% if grades %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Unit Code</th>
+                                    <th>Unit Name</th>
+                                    <th>Score (%)</th>
+                                    <th>Grade</th>
+                                    <th>Remarks</th>
+                                    <th>Last Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ grade.unit.code if grade.unit else 'N/A' }}</strong>
+                                    </td>
+                                    <td>{{ grade.unit.name if grade.unit else 'N/A' }}</td>
+                                    <td>
+                                        {% if grade.score is not none %}
+                                            <strong>{{ "%.1f"|format(grade.score) }}%</strong>
+                                        {% else %}
+                                            <span class="text-muted">Not graded</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if grade.grade_letter %}
+                                            <span class="badge bg-{{ 'success' if grade.grade_letter == 'A' else 'primary' if grade.grade_letter == 'B' else 'warning' if grade.grade_letter == 'C' else 'info' if grade.grade_letter == 'D' else 'danger' }}">
+                                                {{ grade.grade_letter }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ grade.remarks or 'No remarks' }}</small>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ grade.updated_at.strftime('%Y-%m-%d %H:%M') if grade.updated_at else 'N/A' }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+
+                    <!-- Ungraded Units -->
+                    {% if ungraded_units %}
+                    <div class="mt-4">
+                        <h6>Units Pending Grading</h6>
+                        <div class="row">
+                            {% for unit in ungraded_units %}
+                            <div class="col-md-4 mb-2">
+                                <div class="card border-warning">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">{{ unit.code }}</small>
+                                        <div class="fw-bold">{{ unit.name }}</div>
+                                        <span class="badge bg-warning">Pending Grade</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Performance Summary -->
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Performance Summary:</strong> 
+                            You have completed {{ graded_units }} out of {{ total_units }} units with an average score of {{ "%.1f"|format(average_score) }}%.
+                            {% if average_score >= 80 %}
+                                <span class="text-success">Excellent performance!</span>
+                            {% elif average_score >= 70 %}
+                                <span class="text-primary">Good performance!</span>
+                            {% elif average_score >= 60 %}
+                                <span class="text-warning">Average performance. Keep working hard!</span>
+                            {% else %}
+                                <span class="text-danger">You need to improve your performance.</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Lecturer(s) for Your Course -->
+                    <h3>Lecturer(s) for Your Course</h3>
+                    {% if lecturers %}
+                        <ul>
+                            {% for lecturer in lecturers %}
+                                <li>{{ lecturer.full_name or lecturer.first_name ~ ' ' ~ lecturer.last_name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No lecturer assigned yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% elif active_tab == 'reports' %}
+    <!-- Reports Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Reports & Documents
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="{{ url_for('student.download_results_pdf') }}" class="btn btn-primary w-100 mb-2" target="_blank">
+                                <i class="fas fa-file-pdf me-2"></i>Download Result Slip (PDF)
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ url_for('student.generate_fee_statement') }}" class="btn btn-outline-success w-100 mb-2">
+                                <i class="fas fa-receipt me-2"></i>Fee Statement
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ url_for('student.generate_attendance_record') }}" class="btn btn-outline-info w-100 mb-2">
+                                <i class="fas fa-calendar-check me-2"></i>Attendance Record
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %} 

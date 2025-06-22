@@ -1,0 +1,182 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Slideshow Management{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Slideshow Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('admin.add_slideshow_slide') }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Add Slide
+        </a>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-images"></i> Manage Homepage Slideshow</h5>
+    </div>
+    <div class="card-body">
+        {% if slides %}
+        <div class="row" id="slideshow-container">
+            {% for slide in slides %}
+            <div class="col-md-6 col-lg-4 mb-4" data-slide-id="{{ slide.id }}">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="position-relative">
+                        <img src="{{ url_for('static', filename='uploads/' + slide.image_url) }}" 
+                             class="card-img-top" alt="{{ slide.title }}" style="height: 200px; object-fit: cover;">
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge {% if slide.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                {% if slide.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </div>
+                        <div class="position-absolute top-0 start-0 m-2">
+                            <span class="badge bg-primary">Order: {{ slide.order }}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ slide.title }}</h5>
+                        <p class="card-text text-muted">{{ slide.description|truncate(100) }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ slide.created_at.strftime('%Y-%m-%d') }}
+                            </small>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('admin.edit_slideshow_slide', id=slide.id) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        onclick="deleteSlide({{ slide.id }}, '{{ slide.title }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle"></i>
+            <strong>Tip:</strong> You can drag and drop slides to reorder them. The order determines the sequence in which slides appear on the homepage.
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-images fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No slideshow slides found</h5>
+            <p class="text-muted">Get started by adding your first slideshow slide.</p>
+            <a href="{{ url_for('admin.add_slideshow_slide') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add First Slide
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Preview Section -->
+{% if slides %}
+<div class="card shadow mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-eye"></i> Slideshow Preview</h5>
+    </div>
+    <div class="card-body">
+        <div class="slideshow-preview">
+            <div class="slideshow-container" style="max-width: 800px; margin: 0 auto;">
+                <div class="slideshow-wrapper" style="height: 400px;">
+                    {% for slide in slides %}
+                    <div class="slide {% if loop.first %}active{% endif %}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: {% if loop.first %}1{% else %}0{% endif %}; transition: opacity 0.8s ease-in-out;">
+                        <div class="slide-image" style="height: 70%; overflow: hidden;">
+                            <img src="{{ url_for('static', filename='uploads/' + slide.image_url) }}" 
+                                 alt="{{ slide.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="slide-message" style="background: linear-gradient(135deg, rgba(26, 35, 126, 0.9), rgba(92, 107, 192, 0.9)); color: white; padding: 15px; text-align: center;">
+                            <h6 style="margin: 0 0 5px 0;">{{ slide.title }}</h6>
+                            <p style="margin: 0; font-size: 0.9rem;">{{ slide.description|truncate(80) }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Navigation arrows -->
+                <button class="slideshow-nav prev" onclick="changePreviewSlide(-1)" style="position: absolute; top: 50%; transform: translateY(-50%); left: 10px; background: rgba(255, 255, 255, 0.9); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="slideshow-nav next" onclick="changePreviewSlide(1)" style="position: absolute; top: 50%; transform: translateY(-50%); right: 10px; background: rgba(255, 255, 255, 0.9); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <!-- Dots indicator -->
+                <div class="slideshow-dots" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;">
+                    {% for slide in slides %}
+                    <span class="dot {% if loop.first %}active{% endif %}" onclick="currentPreviewSlide({{ loop.index }})" style="width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, {% if loop.first %}1{% else %}0.5{% endif %}); cursor: pointer;"></span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+let currentPreviewSlideIndex = 0;
+const previewSlides = document.querySelectorAll('.slideshow-preview .slide');
+const previewDots = document.querySelectorAll('.slideshow-preview .dot');
+
+function showPreviewSlide(index) {
+    previewSlides.forEach(slide => slide.style.opacity = '0');
+    previewDots.forEach(dot => dot.classList.remove('active'));
+    
+    if (previewSlides[index]) {
+        previewSlides[index].style.opacity = '1';
+    }
+    if (previewDots[index]) {
+        previewDots[index].classList.add('active');
+    }
+}
+
+function changePreviewSlide(direction) {
+    currentPreviewSlideIndex += direction;
+    
+    if (currentPreviewSlideIndex >= previewSlides.length) {
+        currentPreviewSlideIndex = 0;
+    }
+    if (currentPreviewSlideIndex < 0) {
+        currentPreviewSlideIndex = previewSlides.length - 1;
+    }
+    
+    showPreviewSlide(currentPreviewSlideIndex);
+}
+
+function currentPreviewSlide(index) {
+    currentPreviewSlideIndex = index - 1;
+    showPreviewSlide(currentPreviewSlideIndex);
+}
+
+function deleteSlide(slideId, slideTitle) {
+    if (confirm(`Are you sure you want to delete the slide "${slideTitle}"?`)) {
+        fetch(`/admin/slideshow/${slideId}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error deleting slide');
+            }
+        });
+    }
+}
+
+// Auto-advance preview slides every 8 seconds
+setInterval(() => {
+    if (previewSlides.length > 1) {
+        changePreviewSlide(1);
+    }
+}, 8000);
+</script>
+{% endblock %} 

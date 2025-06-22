@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+
+{% block title %}{{ unit.name }} - Unit Grading{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-star me-2"></i>
+            Unit Grading: {{ unit.name }}
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('lecturer.grading') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Grading
+            </a>
+        </div>
+    </div>
+
+    <!-- Unit Information -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Unit Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <strong>Unit Code:</strong><br>
+                            <span class="badge bg-primary">{{ unit.code }}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Unit Name:</strong><br>
+                            {{ unit.name }}
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Credits:</strong><br>
+                            {{ unit.credits or 'N/A' }}
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Students:</strong><br>
+                            {{ students|length }}
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Course:</strong><br>
+                            <span class="badge bg-info">{{ course.code }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if students %}
+    <!-- Grading Form -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>
+                        Student Grades
+                    </h5>
+                    <div>
+                        <button class="btn btn-success btn-sm" onclick="saveAllGrades()">
+                            <i class="fas fa-save me-1"></i>Save All Grades
+                        </button>
+                        <button class="btn btn-info btn-sm" onclick="exportGrades()">
+                            <i class="fas fa-download me-1"></i>Export
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="gradingForm">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Student Name</th>
+                                        <th>Registration No.</th>
+                                        <th>Score (%)</th>
+                                        <th>Grade</th>
+                                        <th>Remarks</th>
+                                        <th>Last Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr data-student-id="{{ student.id }}">
+                                        <td>{{ loop.index }}</td>
+                                        <td>
+                                            <strong>{{ student.first_name }} {{ student.last_name }}</strong>
+                                        </td>
+                                        <td>{{ student.registration_number or 'N/A' }}</td>
+                                        <td>
+                                            <input type="number" 
+                                                   class="form-control form-control-sm grade-score" 
+                                                   name="score_{{ student.id }}"
+                                                   data-student-id="{{ student.id }}"
+                                                   min="0" 
+                                                   max="100" 
+                                                   step="0.1"
+                                                   value="{{ grades[student.id].score if grades[student.id] else '' }}"
+                                                   placeholder="Enter score">
+                                        </td>
+                                        <td>
+                                            <span class="grade-letter" data-student-id="{{ student.id }}">
+                                                {% if grades[student.id] %}
+                                                    <span class="badge bg-{{ get_grade_color(grades[student.id].grade_letter) }}">
+                                                        {{ grades[student.id].grade_letter }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">-</span>
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <input type="text" 
+                                                   class="form-control form-control-sm" 
+                                                   name="remarks_{{ student.id }}"
+                                                   data-student-id="{{ student.id }}"
+                                                   value="{{ grades[student.id].remarks if grades[student.id] else '' }}"
+                                                   placeholder="Add remarks">
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                {% if grades[student.id] %}
+                                                    {{ grades[student.id].updated_at.strftime('%Y-%m-%d %H:%M') if grades[student.id].updated_at else 'N/A' }}
+                                                {% else %}
+                                                    Not graded
+                                                {% endif %}
+                                            </small>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grade Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Grade Statistics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <h4 class="text-success" id="totalGraded">0</h4>
+                                <small class="text-muted">Graded</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <h4 class="text-warning" id="pendingGrades">0</h4>
+                                <small class="text-muted">Pending</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <h4 class="text-primary" id="averageScore">0%</h4>
+                                <small class="text-muted">Average</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <h4 class="text-info" id="highestScore">0%</h4>
+                                <small class="text-muted">Highest</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <h4 class="text-danger" id="lowestScore">0%</h4>
+                                <small class="text-muted">Lowest</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="text-center">
+                                <h4 class="text-secondary" id="completionRate">0%</h4>
+                                <small class="text-muted">Completion</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Grade Distribution -->
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <h6>Grade Distribution</h6>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-success fs-6" id="gradeA">0</span>
+                                        <div><small>A (80-100%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-primary fs-6" id="gradeB">0</span>
+                                        <div><small>B (70-79%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-warning fs-6" id="gradeC">0</span>
+                                        <div><small>C (60-69%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-info fs-6" id="gradeD">0</span>
+                                        <div><small>D (50-59%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-danger fs-6" id="gradeF">0</span>
+                                        <div><small>F (0-49%)</small></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="text-center">
+                                        <span class="badge bg-secondary fs-6" id="gradePending">0</span>
+                                        <div><small>Pending</small></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- No Students -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Students Enrolled</h4>
+                    <p class="text-muted">
+                        No students are currently enrolled in this course.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Grade Update Modal -->
+<div class="modal fade" id="gradeUpdateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Grade Update</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="gradeUpdateMessage"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-calculate grade letters when score changes
+    document.querySelectorAll('.grade-score').forEach(input => {
+        input.addEventListener('input', function() {
+            const score = parseFloat(this.value);
+            const studentId = this.dataset.studentId;
+            
+            if (!isNaN(score) && score >= 0 && score <= 100) {
+                const gradeLetter = getGradeLetter(score);
+                const gradeElement = document.querySelector(`.grade-letter[data-student-id="${studentId}"]`);
+                gradeElement.innerHTML = `<span class="badge bg-${getGradeColor(gradeLetter)}">${gradeLetter}</span>`;
+            }
+            
+            updateStatistics();
+        });
+    });
+    
+    // Initial statistics update
+    updateStatistics();
+});
+
+function getGradeLetter(score) {
+    if (score >= 80) return 'A';
+    if (score >= 70) return 'B';
+    if (score >= 60) return 'C';
+    if (score >= 50) return 'D';
+    return 'F';
+}
+
+function getGradeColor(grade) {
+    switch(grade) {
+        case 'A': return 'success';
+        case 'B': return 'primary';
+        case 'C': return 'warning';
+        case 'D': return 'info';
+        case 'F': return 'danger';
+        default: return 'secondary';
+    }
+}
+
+function updateStatistics() {
+    const scoreInputs = document.querySelectorAll('.grade-score');
+    let totalGraded = 0;
+    let totalScore = 0;
+    let pendingGrades = 0;
+    let scores = [];
+    let gradeDistribution = {A: 0, B: 0, C: 0, D: 0, F: 0, pending: 0};
+    
+    scoreInputs.forEach(input => {
+        const score = parseFloat(input.value);
+        if (!isNaN(score) && score >= 0 && score <= 100) {
+            totalGraded++;
+            totalScore += score;
+            scores.push(score);
+            const grade = getGradeLetter(score);
+            gradeDistribution[grade]++;
+        } else if (input.value !== '') {
+            pendingGrades++;
+            gradeDistribution.pending++;
+        } else {
+            gradeDistribution.pending++;
+        }
+    });
+    
+    const totalStudents = scoreInputs.length;
+    const averageScore = totalGraded > 0 ? (totalScore / totalGraded).toFixed(1) : 0;
+    const highestScore = scores.length > 0 ? Math.max(...scores) : 0;
+    const lowestScore = scores.length > 0 ? Math.min(...scores) : 0;
+    const completionRate = totalStudents > 0 ? ((totalGraded / totalStudents) * 100).toFixed(1) : 0;
+    
+    document.getElementById('totalGraded').textContent = totalGraded;
+    document.getElementById('pendingGrades').textContent = pendingGrades;
+    document.getElementById('averageScore').textContent = averageScore + '%';
+    document.getElementById('highestScore').textContent = highestScore + '%';
+    document.getElementById('lowestScore').textContent = lowestScore + '%';
+    document.getElementById('completionRate').textContent = completionRate + '%';
+    
+    document.getElementById('gradeA').textContent = gradeDistribution.A;
+    document.getElementById('gradeB').textContent = gradeDistribution.B;
+    document.getElementById('gradeC').textContent = gradeDistribution.C;
+    document.getElementById('gradeD').textContent = gradeDistribution.D;
+    document.getElementById('gradeF').textContent = gradeDistribution.F;
+    document.getElementById('gradePending').textContent = gradeDistribution.pending;
+}
+
+function saveAllGrades() {
+    const grades = [];
+    const scoreInputs = document.querySelectorAll('.grade-score');
+    
+    scoreInputs.forEach(input => {
+        const score = parseFloat(input.value);
+        if (!isNaN(score) && score >= 0 && score <= 100) {
+            const studentId = input.dataset.studentId;
+            const remarksInput = document.querySelector(`input[name="remarks_${studentId}"]`);
+            const remarks = remarksInput ? remarksInput.value : '';
+            
+            grades.push({
+                student_id: parseInt(studentId),
+                unit_id: {{ unit.id }},
+                score: score,
+                remarks: remarks
+            });
+        }
+    });
+    
+    if (grades.length === 0) {
+        showMessage('No valid grades to save.', 'warning');
+        return;
+    }
+    
+    // Save grades
+    fetch('{{ url_for("lecturer.bulk_update_grades") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            unit_id: {{ unit.id }},
+            grades: grades
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showMessage(data.message, 'success');
+            // Reload page to show updated timestamps
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            showMessage(data.message, 'danger');
+        }
+    })
+    .catch(error => {
+        showMessage('Error saving grades: ' + error.message, 'danger');
+    });
+}
+
+function showMessage(message, type) {
+    const modal = new bootstrap.Modal(document.getElementById('gradeUpdateModal'));
+    const messageDiv = document.getElementById('gradeUpdateMessage');
+    messageDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+    modal.show();
+}
+
+function exportGrades() {
+    // Implementation for exporting grades to CSV/Excel
+    alert('Export functionality will be implemented soon.');
+}
+</script>
+{% endblock %} 

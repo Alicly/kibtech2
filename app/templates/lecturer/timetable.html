@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Timetable - Lecturer Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Class Timetable</h1>
+    </div>
+
+    <!-- Timetable -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set time_slots = [
+                            ('08:00', '09:00'),
+                            ('09:00', '10:00'),
+                            ('10:00', '11:00'),
+                            ('11:00', '12:00'),
+                            ('12:00', '13:00'),
+                            ('13:00', '14:00'),
+                            ('14:00', '15:00'),
+                            ('15:00', '16:00'),
+                            ('16:00', '17:00')
+                        ] %}
+                        
+                        {% for start_time, end_time in time_slots %}
+                        <tr>
+                            <td>{{ start_time }} - {{ end_time }}</td>
+                            {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+                            <td>
+                                {% for class in timetable %}
+                                    {% if class.day == day and class.start_time.strftime('%H:%M') == start_time %}
+                                    <div class="class-slot p-2 mb-2 bg-primary text-white rounded">
+                                        <strong>{{ class.name }}</strong><br>
+                                        <small>{{ class.room }}</small>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any JavaScript functionality here if needed
+});
+</script>
+{% endblock %} 

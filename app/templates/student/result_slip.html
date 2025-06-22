@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <h2>KITELAKAPEL TECHNICAL TRAINING INSTITUTE</h2>
+                        <h4>EXAMINATION RESULT SLIP</h4>
+                        <p>Academic Year: {{ academic_year }}</p>
+                        <p>Semester: {{ semester }}</p>
+                    </div>
+                    
+                    <!-- Student Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Student Name:</strong> {{ student.first_name }} {{ student.last_name }}</p>
+                            <p><strong>Student ID:</strong> {{ student.student_number }}</p>
+                            <p><strong>Course:</strong> {{ student.course.name if student.course else 'Not assigned' }}</p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <p><strong>Date Generated:</strong> {{ current_date.strftime('%Y-%m-%d') }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Table -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Unit Code</th>
+                                    <th>Unit Name</th>
+                                    <th>Marks Obtained</th>
+                                    <th>Total Marks</th>
+                                    <th>Grade</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ result.exam.module.code if result.exam and result.exam.module else 'N/A' }}</td>
+                                    <td>{{ result.exam.module.name if result.exam and result.exam.module else 'N/A' }}</td>
+                                    <td>{{ "%.1f"|format(result.marks_obtained) if result.marks_obtained else 'N/A' }}</td>
+                                    <td>{{ "%.1f"|format(result.exam.total_marks) if result.exam and result.exam.total_marks else 'N/A' }}</td>
+                                    <td>{{ result.grade or 'N/A' }}</td>
+                                    <td>{{ result.remarks or 'N/A' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <p><strong>Examinations Officer</strong></p>
+                            <p>Signature: _________________</p>
+                            <p>Date: _________________</p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <p><strong>Institute Stamp</strong></p>
+                            <p>Date: _________________</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Print Button -->
+                    <div class="text-center mt-4">
+                        <button onclick="window.print()" class="btn btn-primary">
+                            Print Result Slip
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn-primary {
+        display: none;
+    }
+    .card {
+        border: none !important;
+    }
+    .table {
+        border-collapse: collapse !important;
+    }
+    .table td, .table th {
+        border: 1px solid #000 !important;
+    }
+}
+</style>
+{% endblock %} 

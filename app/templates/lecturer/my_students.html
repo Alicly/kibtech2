@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}My Students - Lecturer Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-users me-2"></i>
+            My Students
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('lecturer.dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Debug Information -->
+    <div class="alert alert-info">
+        <h4>Debug Info:</h4>
+        <p>Number of courses: {{ course_students|length }}</p>
+        <p>Courses: 
+        {% for course in course_students.keys() %}
+            {{ course.name }} ({{ course_students[course]|length }} students)
+        {% endfor %}
+        </p>
+    </div>
+
+    {% for course, students in course_students.items() %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">{{ course.name }}</h3>
+            <p class="mb-0 text-muted">Number of students in this course: {{ students|length }}</p>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Registration Number</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td><strong>{{ student.first_name }} {{ student.last_name }}</strong></td>
+                            <td>{{ student.student_number }}</td>
+                            <td>{{ student.email }}</td>
+                            <td>{{ student.phone or 'N/A' }}</td>
+                            <td>
+                                {% if student.status == 'active' %}
+                                    <span class="badge bg-success">Active</span>
+                                {% elif student.status == 'inactive' %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ student.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('lecturer.student_grading', student_id=student.id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-star me-1"></i>View & Grade
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">
+                                <i class="fas fa-users me-2"></i>No active students enrolled in this course.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+        <h4><i class="fas fa-exclamation-triangle me-2"></i>No Courses Found</h4>
+        <p>You are not assigned to any courses.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %} 

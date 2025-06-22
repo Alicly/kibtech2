@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Register New Account</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="" id="registrationForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Common Fields -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.first_name.label(class="form-label") }}
+                                    {{ form.first_name(class="form-control") }}
+                                    {% if form.first_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.first_name.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.last_name.label(class="form-label") }}
+                                    {{ form.last_name(class="form-control") }}
+                                    {% if form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.last_name.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.username.label(class="form-label") }}
+                                    {{ form.username(class="form-control") }}
+                                    {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.username.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.email.label(class="form-label") }}
+                                    {{ form.email(class="form-control") }}
+                                    {% if form.email.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.email.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.password.label(class="form-label") }}
+                                    {{ form.password(class="form-control") }}
+                                    {% if form.password.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.password.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.password2.label(class="form-label") }}
+                                    {{ form.password2(class="form-control") }}
+                                    {% if form.password2.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.password2.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.phone.label(class="form-label") }}
+                                    {{ form.phone(class="form-control") }}
+                                    {% if form.phone.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.phone.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    {{ form.role.label(class="form-label") }}
+                                    {{ form.role(class="form-select", id="roleSelect") }}
+                                    {% if form.role.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.role.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    {{ form.address.label(class="form-label") }}
+                                    {{ form.address(class="form-control", rows="3") }}
+                                    {% if form.address.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.address.errors %}
+                                        <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Student Specific Fields -->
+                        <div id="studentFields" class="d-none">
+                            <h5 class="text-primary mb-3">Student Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        {{ form.registration_number.label(class="form-label") }}
+                                        {{ form.registration_number(class="form-control", id="regNumber") }}
+                                        <small class="form-text text-muted">Enter your registration number to auto-fill course details</small>
+                                        {% if form.registration_number.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.registration_number.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        {{ form.date_of_birth.label(class="form-label") }}
+                                        {{ form.date_of_birth(class="form-control", type="date") }}
+                                        {% if form.date_of_birth.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.date_of_birth.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        {{ form.gender.label(class="form-label") }}
+                                        {{ form.gender(class="form-select") }}
+                                        {% if form.gender.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.gender.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        {{ form.course_id.label(class="form-label") }}
+                                        {{ form.course_id(class="form-select", id="courseSelect") }}
+                                        {% if form.course_id.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.course_id.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lecturer Specific Fields -->
+                        <div id="lecturerFields" class="d-none">
+                            <h5 class="text-primary mb-3">Lecturer Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        {{ form.lecturer_id.label(class="form-label") }}
+                                        {{ form.lecturer_id(class="form-control") }}
+                                        {% if form.lecturer_id.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.lecturer_id.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        {{ form.department.label(class="form-label") }}
+                                        {{ form.department(class="form-control") }}
+                                        {% if form.department.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.department.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-group">
+                                        {{ form.specialization.label(class="form-label") }}
+                                        {{ form.specialization(class="form-control") }}
+                                        {% if form.specialization.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.specialization.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-group">
+                                        {{ form.lecturer_courses.label(class="form-label") }}
+                                        {{ form.lecturer_courses(class="form-select", multiple=true) }}
+                                        <small class="form-text text-muted">Select all courses you will be teaching</small>
+                                        {% if form.lecturer_courses.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.lecturer_courses.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Staff Specific Fields -->
+                        <div id="staffFields" class="d-none">
+                            <h5 class="text-primary mb-3">Staff Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        {{ form.staff_id.label(class="form-label") }}
+                                        {{ form.staff_id(class="form-control") }}
+                                        {% if form.staff_id.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.staff_id.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        {{ form.position.label(class="form-label") }}
+                                        {{ form.position(class="form-control") }}
+                                        {% if form.position.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.position.errors %}
+                                            <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form.submit(class="btn btn-primary") }}
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-link">Already have an account? Sign In</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('roleSelect');
+    const studentFields = document.getElementById('studentFields');
+    const lecturerFields = document.getElementById('lecturerFields');
+    const staffFields = document.getElementById('staffFields');
+    const regNumberInput = document.getElementById('regNumber');
+    const courseSelect = document.getElementById('courseSelect');
+
+    function toggleFields() {
+        const role = roleSelect.value;
+        
+        // Hide all role-specific fields
+        studentFields.classList.add('d-none');
+        lecturerFields.classList.add('d-none');
+        staffFields.classList.add('d-none');
+        
+        // Show fields based on selected role
+        if (role === 'student') {
+            studentFields.classList.remove('d-none');
+        } else if (role === 'lecturer') {
+            lecturerFields.classList.remove('d-none');
+        } else if (role === 'staff') {
+            staffFields.classList.remove('d-none');
+        }
+    }
+
+    // Auto-fetch student data when registration number is entered
+    async function fetchStudentData(regNumber) {
+        if (!regNumber) return;
+        
+        try {
+            const response = await fetch(`/auth/fetch_student_data/${regNumber}`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    // Auto-fill the form with student data
+                    document.getElementById('first_name').value = data.student.first_name;
+                    document.getElementById('last_name').value = data.student.last_name;
+                    document.getElementById('email').value = data.student.email;
+                    document.getElementById('phone').value = data.student.phone || '';
+                    document.getElementById('address').value = data.student.address || '';
+                    document.getElementById('date_of_birth').value = data.student.date_of_birth || '';
+                    document.getElementById('gender').value = data.student.gender || '';
+                    document.getElementById('course_id').value = data.student.course_id || '';
+                    
+                    // Show success message
+                    showAlert('Student data loaded successfully!', 'success');
+                } else {
+                    showAlert('Student not found with this registration number.', 'warning');
+                }
+            } else {
+                showAlert('Error fetching student data.', 'danger');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('Error fetching student data.', 'danger');
+        }
+    }
+
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        const form = document.getElementById('registrationForm');
+        form.insertBefore(alertDiv, form.firstChild);
+        
+        // Auto-remove alert after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Event listeners
+    roleSelect.addEventListener('change', toggleFields);
+    
+    if (regNumberInput) {
+        regNumberInput.addEventListener('blur', function() {
+            fetchStudentData(this.value);
+        });
+    }
+
+    // Initial state
+    toggleFields();
+});
+</script>
+{% endblock %} 

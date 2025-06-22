@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Students - TVET{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group mb-4">
+            <a href="{{ url_for('staff.dashboard') }}" class="list-group-item list-group-item-action"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{{ url_for('staff.courses') }}" class="list-group-item list-group-item-action"><i class="fas fa-book"></i> Courses</a>
+            <a href="{{ url_for('staff.students') }}" class="list-group-item list-group-item-action active"><i class="fas fa-users"></i> Students</a>
+            <a href="{{ url_for('staff.fees') }}" class="list-group-item list-group-item-action"><i class="fas fa-money-bill"></i> Fees</a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h2 class="mb-4">Enrolled Students</h2>
+        <form class="mb-3" method="get" action="{{ url_for('staff.students') }}">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-2">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ filter_first_name or '' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ filter_last_name or '' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="text" class="form-control" id="email" name="email" value="{{ filter_email or '' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="student_number" class="form-label">Reg. Number</label>
+                    <input type="text" class="form-control" id="student_number" name="student_number" value="{{ filter_student_number or '' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="course_id" class="form-label">Course</label>
+                    <select class="form-select" id="course_id" name="course_id">
+                        <option value="">All</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}" {% if filter_course_id == course.id|string %}selected{% endif %}>{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select class="form-select" id="gender" name="gender">
+                        <option value="">All</option>
+                        <option value="male" {% if filter_gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if filter_gender == 'female' %}selected{% endif %}>Female</option>
+                        <option value="other" {% if filter_gender == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">All</option>
+                        <option value="active" {% if filter_status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if filter_status == 'inactive' %}selected{% endif %}>Inactive</option>
+                        <option value="graduated" {% if filter_status == 'graduated' %}selected{% endif %}>Graduated</option>
+                        <option value="suspended" {% if filter_status == 'suspended' %}selected{% endif %}>Suspended</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="phone" class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="phone" name="phone" value="{{ filter_phone or '' }}">
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ url_for('staff.students') }}" class="btn btn-secondary w-100">Reset</a>
+                </div>
+            </div>
+        </form>
+        {% if students is defined %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Course</th>
+                    <th>Fee Balance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.first_name }} {{ student.last_name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.course.name if student.course else 'N/A' }}</td>
+                    <td>{{ student.fee_balance if student.fee_balance is not none else 'N/A' }}</td>
+                    <td><a href="{{ url_for('staff.student_profile', student_id=student.id) }}" class="btn btn-sm btn-primary">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        {% for enrollment in enrollments %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">{{ enrollment.course.name }}</div>
+            <div class="card-body">
+                <h5>Student: {{ enrollment.student.first_name }} {{ enrollment.student.last_name }}</h5>
+                <p>Email: {{ enrollment.student.email }}</p>
+                <p>Enrollment Date: {{ enrollment.enrollment_date.strftime('%Y-%m-%d') }}</p>
+                <a href="{{ url_for('staff.student_profile', student_id=enrollment.student.id) }}" class="btn btn-sm btn-primary">View Profile</a>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

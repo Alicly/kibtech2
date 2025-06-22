@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}Lecturer Dashboard - KITELAKAPEL TECHNICAL TRAINING INSTITUTE{% endblock %}
+
+{% block sidebar %}
+<div class="list-group list-group-flush">
+    <a href="#overview" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+        <i class="fas fa-home me-2"></i>Overview
+    </a>
+    <a href="#courses" class="list-group-item list-group-item-action" data-bs-toggle="list">
+        <i class="fas fa-graduation-cap me-2"></i>My Courses
+    </a>
+    <a href="{{ url_for('lecturer.my_students') }}" class="list-group-item list-group-item-action">
+        <i class="fas fa-users me-2"></i>My Students
+    </a>
+    <a href="#units" class="list-group-item list-group-item-action" data-bs-toggle="list">
+        <i class="fas fa-book me-2"></i>Teaching Units
+    </a>
+    <a href="#classes" class="list-group-item list-group-item-action" data-bs-toggle="list">
+        <i class="fas fa-chalkboard-teacher me-2"></i>My Classes
+    </a>
+    <a href="#assignments" class="list-group-item list-group-item-action" data-bs-toggle="list">
+        <i class="fas fa-tasks me-2"></i>Assignments
+    </a>
+    <a href="#grades" class="list-group-item list-group-item-action" data-bs-toggle="list">
+        <i class="fas fa-star me-2"></i>Grades
+    </a>
+    <a href="#attendance" class="list-group-item list-group-item-action" data-bs-toggle="list">
+        <i class="fas fa-clipboard-check me-2"></i>Attendance
+    </a>
+    <a href="#materials" class="list-group-item list-group-item-action" data-bs-toggle="list">
+        <i class="fas fa-file-alt me-2"></i>Teaching Materials
+    </a>
+    <a href="#schedule" class="list-group-item list-group-item-action" data-bs-toggle="list">
+        <i class="fas fa-calendar-alt me-2"></i>Schedule
+    </a>
+    <a href="#profile" class="list-group-item list-group-item-action" data-bs-toggle="list">
+        <i class="fas fa-user me-2"></i>Profile
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="tab-content">
+        <!-- Overview Tab -->
+        <div class="tab-pane fade show active" id="overview">
+            <!-- Quick Stats -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <a href="{{ url_for('lecturer.my_students') }}" class="card-link">
+                        <div class="card bg-danger text-white h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">My Students</h6>
+                                <h2 class="mb-0">{{ total_students }}</h2>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ url_for('lecturer.courses') }}" class="card-link">
+                        <div class="card bg-success text-white h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">My Courses</h6>
+                                <h2 class="mb-0">{{ total_courses }}</h2>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ url_for('lecturer.units') }}" class="card-link">
+                        <div class="card bg-info text-white h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Teaching Units</h6>
+                                <h2 class="mb-0">{{ total_units }}</h2>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ url_for('lecturer.classes') }}" class="card-link">
+                        <div class="card bg-warning text-white h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Active Classes</h6>
+                                <h2 class="mb-0">{{ active_classes }}</h2>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-md-8">
+                    <!-- Today's Schedule -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Today's Schedule</h5>
+                            <a href="{{ url_for('lecturer.timetable') }}" class="btn btn-sm btn-primary">View Full Schedule</a>
+                        </div>
+                        <div class="card-body">
+                            {% if today_schedule %}
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Time</th>
+                                                <th>Class</th>
+                                                <th>Room</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for class in today_schedule %}
+                                            <tr>
+                                                <td>{{ class.start_time.strftime('%I:%M %p') }} - {{ class.end_time.strftime('%I:%M %p') }}</td>
+                                                <td>{{ class.name }}</td>
+                                                <td>{{ class.room }}</td>
+                                                <td>
+                                                    <a href="{{ url_for('lecturer.attendance', class_id=class.id) }}" class="btn btn-sm btn-outline-primary">Take Attendance</a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted mb-0">No classes scheduled for today.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Recent Activities</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_activities %}
+                                <div class="list-group list-group-flush">
+                                    {% for activity in recent_activities %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ activity.title }}</h6>
+                                            <small class="text-muted">
+                                                {% if activity.timestamp.strftime is defined %}
+                                                    {{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                                                {% else %}
+                                                    {{ activity.timestamp }}
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                        <p class="mb-1">{{ activity.description }}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted mb-0">No recent activities.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-md-4">
+                    <!-- Quick Actions -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-tools me-2"></i>
+                                        Quick Actions
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-12 col-md-3">
+                                            <a href="{{ url_for('lecturer.grading') }}" class="btn btn-primary w-100 py-3">
+                                                <i class="fas fa-star me-2"></i><br>Grading System
+                                            </a>
+                                        </div>
+                                        <div class="col-12 col-md-3">
+                                            <a href="{{ url_for('lecturer.courses') }}" class="btn btn-success w-100 py-3">
+                                                <i class="fas fa-book me-2"></i><br>My Courses
+                                            </a>
+                                        </div>
+                                        <div class="col-12 col-md-3">
+                                            <a href="{{ url_for('lecturer.units') }}" class="btn btn-info w-100 py-3">
+                                                <i class="fas fa-cubes me-2"></i><br>My Units
+                                            </a>
+                                        </div>
+                                        <div class="col-12 col-md-3">
+                                            <a href="{{ url_for('lecturer.classes') }}" class="btn btn-warning w-100 py-3">
+                                                <i class="fas fa-chalkboard-teacher me-2"></i><br>My Classes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Tasks -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Pending Tasks</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if pending_tasks %}
+                                <div class="list-group list-group-flush">
+                                    {% for task in pending_tasks %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ task.title }}</h6>
+                                            <small class="text-muted">Due: {{ task.due_date.strftime('%Y-%m-%d') }}</small>
+                                        </div>
+                                        <p class="mb-1">{{ task.description }}</p>
+                                        <a href="{{ task.link }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted mb-0">No pending tasks.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses Tab -->
+        <div class="tab-pane fade" id="courses">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        My Assigned Courses
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if courses %}
+                        <div class="row">
+                            {% for course in courses %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card border-primary">
+                                    <div class="card-header bg-primary text-white">
+                                        <strong>{{ course.code }}</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ course.name }}</h6>
+                                        <p class="card-text text-muted small">{{ course.description[:100] }}{% if course.description|length > 100 %}...{% endif %}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-secondary">{{ course.units.count() }} Units</span>
+                                            <a href="{{ url_for('lecturer.view_course_units', course_id=course.id) }}" class="btn btn-sm btn-outline-primary">View Units</a>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>{{ course.duration or 'N/A' }} | 
+                                                <i class="fas fa-users me-1"></i>{{ course.student_count or 0 }} students
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You haven't been assigned to any courses yet. Please contact the administration.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Units Tab -->
+        <div class="tab-pane fade" id="units">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book me-2"></i>
+                        My Teaching Units
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if courses %}
+                        {% set total_units = 0 %}
+                        {% for course in courses %}
+                            {% set course_units = course.units.all() %}
+                            {% if course_units %}
+                                {% set total_units = total_units + course_units|length %}
+                                <h6 class="text-primary">{{ course.code }} - {{ course.name }}</h6>
+                                <div class="row mb-3">
+                                    {% for unit in course_units %}
+                                    <div class="col-md-6 col-lg-4 mb-2">
+                                        <div class="card border-info">
+                                            <div class="card-body p-2">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <strong class="text-info">{{ unit.code }}</strong>
+                                                        <div class="small">{{ unit.name }}</div>
+                                                    </div>
+                                                    <span class="badge bg-info">{{ unit.credits or 'N/A' }} credits</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if total_units == 0 %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No units have been assigned to your courses yet.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                You are teaching <strong>{{ total_units }} units</strong> across <strong>{{ courses|length }} courses</strong>.
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You haven't been assigned to any courses yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Other tabs remain the same -->
+        <div class="tab-pane fade" id="classes">
+            <!-- Classes content -->
+        </div>
+        <div class="tab-pane fade" id="assignments">
+            <!-- Assignments content -->
+        </div>
+        <div class="tab-pane fade" id="grades">
+            <!-- Grades content -->
+        </div>
+        <div class="tab-pane fade" id="attendance">
+            <!-- Attendance content -->
+        </div>
+        <div class="tab-pane fade" id="materials">
+            <!-- Materials content -->
+        </div>
+        <div class="tab-pane fade" id="schedule">
+            <!-- Schedule content -->
+        </div>
+        <div class="tab-pane fade" id="profile">
+            <!-- Profile content -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add any JavaScript functionality here
+</script>
+{% endblock %}
+
+<style>
+    .card-link {
+        text-decoration: none;
+    }
+    .card-link .card {
+        transition: box-shadow 0.2s, background 0.2s, color 0.2s;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .card-link:hover .card, .card-link:focus .card {
+        background: #f8f9fa !important;
+        color: #212529 !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        border: 2px solid #0d6efd;
+    }
+    .card-link .card .card-title, .card-link .card h2 {
+        color: inherit !important;
+    }
+</style> 

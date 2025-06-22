@@ -1,0 +1,32 @@
+{% extends 'staff/staff_base.html' %}
+{% block title %}Staff Dashboard - TVET{% endblock %}
+{% block sidebar %}
+<div class="list-group mb-4">
+    <a href="{{ url_for('staff.dashboard') }}" class="list-group-item list-group-item-action active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="{{ url_for('staff.students') }}" class="list-group-item list-group-item-action"><i class="fas fa-users"></i> Students</a>
+    <a href="{{ url_for('staff.fees') }}" class="list-group-item list-group-item-action"><i class="fas fa-money-bill"></i> Fees</a>
+    <a href="{{ url_for('staff.resources') }}" class="list-group-item list-group-item-action"><i class="fas fa-upload"></i> Resources</a>
+    <a href="{{ url_for('staff.announcements') }}" class="list-group-item list-group-item-action"><i class="fas fa-bullhorn"></i> Announcements</a>
+</div>
+{% endblock %}
+{% block content %}
+<h2 class="mb-4">Welcome, {{ current_user.first_name }}!</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Student List</div>
+            <div class="card-body">
+                <p>Student management features coming soon.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Announcements</div>
+            <div class="card-body">
+                <p>No new announcements.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

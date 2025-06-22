@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - KITELAKAPEL TECHNICAL TRAINING{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">Contact Us</h1>
+                <p class="lead mb-0">Get in touch with KITELAKAPEL TECHNICAL TRAINING for any inquiries about our programs, admissions, or general information.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Institution Details Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h2 class="h4 mb-4">Institution Details</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="h5 mb-3">About KITELAKAPEL TECHNICAL TRAINING</h3>
+                                <p class="text-muted">KITELAKAPEL TECHNICAL TRAINING is a premier technical training institution committed to providing quality education and practical skills to students. Our institution focuses on equipping students with the necessary technical skills and knowledge required in today's competitive job market.</p>
+                                
+                                <h3 class="h5 mb-3 mt-4">Our Mission</h3>
+                                <p class="text-muted">To provide high-quality technical education and training that empowers students with practical skills and knowledge for employment and entrepreneurship.</p>
+                                
+                                <h3 class="h5 mb-3 mt-4">Our Vision</h3>
+                                <p class="text-muted">To be the leading technical training institution in Kenya, producing skilled professionals who contribute to the nation's development.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h3 class="h5 mb-3">Available Courses</h3>
+                                <div class="list-group">
+                                    <div class="list-group-item border-0">
+                                        <h4 class="h6 mb-2">Certificate Courses</h4>
+                                        <ul class="list-unstyled text-muted">
+                                            <li class="mb-2">• Certificate in Electrical Installation</li>
+                                            <li class="mb-2">• Certificate in Plumbing</li>
+                                            <li class="mb-2">• Certificate in Welding</li>
+                                            <li class="mb-2">• Certificate in Carpentry</li>
+                                            <li class="mb-2">• Certificate in Masonry</li>
+                                        </ul>
+                                    </div>
+                                    <div class="list-group-item border-0">
+                                        <h4 class="h6 mb-2">Diploma Courses</h4>
+                                        <ul class="list-unstyled text-muted">
+                                            <li class="mb-2">• Diploma in Electrical Engineering</li>
+                                            <li class="mb-2">• Diploma in Building Technology</li>
+                                            <li class="mb-2">• Diploma in Mechanical Engineering</li>
+                                            <li class="mb-2">• Diploma in Civil Engineering</li>
+                                        </ul>
+                                    </div>
+                                    <div class="list-group-item border-0">
+                                        <h4 class="h6 mb-2">Short Courses</h4>
+                                        <ul class="list-unstyled text-muted">
+                                            <li class="mb-2">• Basic Computer Skills</li>
+                                            <li class="mb-2">• Entrepreneurship Training</li>
+                                            <li class="mb-2">• Technical Drawing</li>
+                                            <li class="mb-2">• Safety Training</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="h4 mb-4">Send us a Message</h2>
+                        <form method="POST" action="{{ url_for('main.contact') }}">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.name.label(class="form-label") }}
+                                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                                        {% for error in form.name.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.email.label(class="form-label") }}
+                                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                                        {% for error in form.email.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mt-3">
+                                {{ form.subject.label(class="form-label") }}
+                                {{ form.subject(class="form-control" + (" is-invalid" if form.subject.errors else "")) }}
+                                {% for error in form.subject.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group mt-3">
+                                {{ form.message.label(class="form-label") }}
+                                {{ form.message(class="form-control" + (" is-invalid" if form.message.errors else ""), rows="5") }}
+                                {% for error in form.message.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mt-4">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h3 class="h5 mb-4">Contact Information</h3>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-3 d-flex align-items-start">
+                                <i class="fas fa-map-marker-alt text-primary me-2 mt-1"></i>
+                                <div>
+                                    <strong>Address:</strong><br>
+                                    KITELAKAPEL TECHNICAL TRAINING<br>
+                                    Kitelakapel, Kenya
+                                </div>
+                            </li>
+                            <li class="mb-3 d-flex align-items-start">
+                                <i class="fas fa-phone text-primary me-2 mt-1"></i>
+                                <div>
+                                    <strong>Phone:</strong><br>
+                                    +254 123 456 789
+                                </div>
+                            </li>
+                            <li class="mb-3 d-flex align-items-start">
+                                <i class="fas fa-envelope text-primary me-2 mt-1"></i>
+                                <div>
+                                    <strong>Email:</strong><br>
+                                    info@kitelakapelttc.edu
+                                </div>
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <i class="fas fa-clock text-primary me-2 mt-1"></i>
+                                <div>
+                                    <strong>Working Hours:</strong><br>
+                                    Monday - Friday: 8:00 AM - 5:00 PM<br>
+                                    Saturday: 9:00 AM - 1:00 PM
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Social Media -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="h5 mb-4">Follow Us</h3>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="text-primary fs-4">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="#" class="text-primary fs-4">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="text-primary fs-4">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="text-primary fs-4">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8191673787!2d36.82194561475453!3d-1.292359999063957!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d2a49f0b4d%3A0x58f6a915356efd38!2sKitelakapel%2C%20Kenya!5e0!3m2!1sen!2sus!4v1647881234567!5m2!1sen!2sus" 
+                            width="100%" 
+                            height="450" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.25);
+    }
+    
+    .social-media a {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .social-media a:hover {
+        transform: translateY(-3px);
+    }
+
+    .list-group-item {
+        background-color: transparent;
+    }
+</style>
+{% endblock %} 

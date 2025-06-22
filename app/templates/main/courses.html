@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Available Courses - KITELAKPEL TECHNICAL TRAINING{% endblock %}
+
+{% block content %}
+<section class="courses-section" style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important; min-height: 100vh !important; padding: 0 !important; margin: 0 !important; width: 100% !important;">
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="h2 mb-4 section-title" style="color: #333333 !important;">Available Courses</h1>
+                
+                <!-- Course Filters -->
+                <div class="card border-0 shadow-sm mb-4 filter-card">
+                    <div class="card-body">
+                        <form method="GET" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="">All Categories</option>
+                                    <option value="Agriculture" {% if request.args.get('category') == 'Agriculture' %}selected{% endif %}>Agriculture</option>
+                                    <option value="Electrical" {% if request.args.get('category') == 'Electrical' %}selected{% endif %}>Electrical</option>
+                                    <option value="Fashion" {% if request.args.get('category') == 'Fashion' %}selected{% endif %}>Fashion</option>
+                                    <option value="Mechanical" {% if request.args.get('category') == 'Mechanical' %}selected{% endif %}>Mechanical</option>
+                                    <option value="Civil" {% if request.args.get('category') == 'Civil' %}selected{% endif %}>Civil</option>
+                                    <option value="Hospitality" {% if request.args.get('category') == 'Hospitality' %}selected{% endif %}>Hospitality</option>
+                                    <option value="Business" {% if request.args.get('category') == 'Business' %}selected{% endif %}>Business</option>
+                                    <option value="ICT" {% if request.args.get('category') == 'ICT' %}selected{% endif %}>ICT</option>
+                                    <option value="Liberal" {% if request.args.get('category') == 'Liberal' %}selected{% endif %}>Liberal</option>
+                                    <option value="Science" {% if request.args.get('category') == 'Science' %}selected{% endif %}>Science</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="level" class="form-label">Level</label>
+                                <select class="form-select" id="level" name="level">
+                                    <option value="">All Levels</option>
+                                    <option value="Certificate II" {% if request.args.get('level') == 'Certificate II' %}selected{% endif %}>Certificate II</option>
+                                    <option value="Level 4" {% if request.args.get('level') == 'Level 4' %}selected{% endif %}>Level 4</option>
+                                    <option value="Level 3" {% if request.args.get('level') == 'Level 3' %}selected{% endif %}>Level 3</option>
+                                    <option value="Artisan" {% if request.args.get('level') == 'Artisan' %}selected{% endif %}>Artisan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Courses Grid -->
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for course in courses.items %}
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm course-card">
+                            {% if course.image_url %}
+                            <img src="{{ url_for('static', filename='uploads/' + course.image_url) }}" class="card-img-top" alt="{{ course.name }}">
+                            {% else %}
+                            <div class="card-img-top course-placeholder d-flex align-items-center justify-content-center">
+                                <i class="fas fa-book fa-3x text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ course.name }}</h5>
+                                <p class="card-text text-muted">{{ course.description[:150] }}{% if course.description|length > 150 %}...{% endif %}</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-primary">{{ course.category }}</span>
+                                    <span class="badge bg-secondary">{{ course.level }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>{{ course.duration }}
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-users me-1"></i>{{ course.capacity }} capacity
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent border-0">
+                                <div class="d-grid">
+                                    <a href="{{ url_for('main.course_details', course_id=course.id) }}" class="btn btn-outline-primary">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No courses found matching your criteria.
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if courses.pages > 1 %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if courses.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.courses', page=courses.prev_num, category=request.args.get('category'), level=request.args.get('level')) }}">
+                                Previous
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in courses.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                            {% if page_num %}
+                                <li class="page-item {% if page_num == courses.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('main.courses', page=page_num, category=request.args.get('category'), level=request.args.get('level')) }}">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if courses.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.courses', page=courses.next_num, category=request.args.get('category'), level=request.args.get('level')) }}">
+                                Next
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .courses-section {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+        min-height: 100vh !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    body {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+    }
+
+    .filter-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid #e9ecef;
+    }
+
+    .course-card {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border: 1px solid #90caf9;
+        transition: all 0.3s ease;
+    }
+    
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-color: #2196f3;
+        background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+    }
+
+    .course-placeholder {
+        height: 200px;
+        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    }
+    
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .section-title {
+        color: #333333 !important;
+        font-weight: 600;
+    }
+
+    .text-muted {
+        color: #666666 !important;
+    }
+
+    .badge {
+        font-weight: 500;
+    }
+
+    .pagination .page-link {
+        color: #007bff;
+        border-color: #dee2e6;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+</style>
+{% endblock %} 

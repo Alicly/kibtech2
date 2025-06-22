@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Unit Registration</h2>
+            
+            <!-- Registered Units -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Currently Registered Units</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Unit Code</th>
+                                    <th>Unit Name</th>
+                                    <th>Semester</th>
+                                    <th>Credits</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for registration in registered_units %}
+                                <tr>
+                                    <td>{{ registration.unit.code }}</td>
+                                    <td>{{ registration.unit.name }}</td>
+                                    <td>{{ registration.unit.semester }}</td>
+                                    <td>{{ registration.unit.credits }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if registration.status == 'Approved' else 'warning' if registration.status == 'Pending' else 'danger' }}">
+                                            {{ registration.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Available Units -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Available Units</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Unit Code</th>
+                                    <th>Unit Name</th>
+                                    <th>Semester</th>
+                                    <th>Credits</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for unit in available_units %}
+                                <tr>
+                                    <td>{{ unit.code }}</td>
+                                    <td>{{ unit.name }}</td>
+                                    <td>{{ unit.semester }}</td>
+                                    <td>{{ unit.credits }}</td>
+                                    <td>
+                                        <form action="{{ url_for('student.register_unit', unit_id=unit.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                Register
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

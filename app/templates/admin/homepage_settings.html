@@ -1,0 +1,131 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Homepage Settings{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Homepage Settings</h1>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-cog"></i> Manage Homepage Content</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            
+            <!-- Institute Information -->
+            <h6 class="text-primary mb-3">Institute Information</h6>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.institute_name.label(class="form-label") }}
+                    {{ form.institute_name(class="form-control") }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.institute_tagline.label(class="form-label") }}
+                    {{ form.institute_tagline(class="form-control") }}
+                </div>
+            </div>
+
+            <!-- Logo Upload -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.institute_logo.label(class="form-label") }}
+                    {{ form.institute_logo(class="form-control", accept="image/*") }}
+                    <small class="form-text text-muted">Recommended: 200x80px, PNG with transparency</small>
+                </div>
+                <div class="col-md-6">
+                    {% if current_logo %}
+                    <label class="form-label">Current Logo:</label>
+                    <div class="border rounded p-2">
+                        <img src="{{ url_for('static', filename='uploads/' + current_logo) }}" 
+                             alt="Current Logo" class="img-fluid" style="max-height: 60px;">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Hero Section -->
+            <h6 class="text-primary mb-3 mt-4">Hero Section</h6>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    {{ form.hero_title.label(class="form-label") }}
+                    {{ form.hero_title(class="form-control") }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    {{ form.hero_subtitle.label(class="form-label") }}
+                    {{ form.hero_subtitle(class="form-control", rows=3) }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.hero_background.label(class="form-label") }}
+                    {{ form.hero_background(class="form-control", accept="image/*") }}
+                    <small class="form-text text-muted">Recommended: 1920x1080px</small>
+                </div>
+                <div class="col-md-6">
+                    {% if current_hero_bg %}
+                    <label class="form-label">Current Hero Background:</label>
+                    <div class="border rounded p-2">
+                        <img src="{{ url_for('static', filename='uploads/' + current_hero_bg) }}" 
+                             alt="Current Hero Background" class="img-fluid" style="max-height: 100px;">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Campus Image -->
+            <h6 class="text-primary mb-3 mt-4">Campus Image</h6>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.campus_image.label(class="form-label") }}
+                    {{ form.campus_image(class="form-control", accept="image/*") }}
+                    <small class="form-text text-muted">Recommended: 800x600px</small>
+                </div>
+                <div class="col-md-6">
+                    {% if current_campus %}
+                    <label class="form-label">Current Campus Image:</label>
+                    <div class="border rounded p-2">
+                        <img src="{{ url_for('static', filename='uploads/' + current_campus) }}" 
+                             alt="Current Campus Image" class="img-fluid" style="max-height: 100px;">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <h6 class="text-primary mb-3 mt-4">Contact Information</h6>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form.contact_email.label(class="form-label") }}
+                    {{ form.contact_email(class="form-control") }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.contact_phone.label(class="form-label") }}
+                    {{ form.contact_phone(class="form-control") }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    {{ form.contact_address.label(class="form-label") }}
+                    {{ form.contact_address(class="form-control", rows=3) }}
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <i class="fas fa-info-circle"></i>
+    <strong>Tip:</strong> After saving, you can preview your changes on the 
+    <a href="{{ url_for('main.index') }}" target="_blank">homepage</a>.
+</div>
+{% endblock %} 

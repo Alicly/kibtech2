@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.name }} - KITELAKAPEL TECHNICAL TRAINING{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Back to Courses -->
+            <div class="mb-4">
+                <a href="{{ url_for('main.courses') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Courses
+                </a>
+            </div>
+
+            <!-- Course Details -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h1 class="h2 mb-4">{{ course.name }}</h1>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Course Code:</strong> {{ course.code }}</p>
+                            <p><strong>Duration:</strong> {{ course.duration }}</p>
+                            <p><strong>Fee:</strong> Ksh {{ "%.2f"|format(course.fee or 0.0) }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Created:</strong> {{ course.created_at.strftime('%B %d, %Y') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="course-description mb-4">
+                        <h3 class="h4 mb-3">Course Description</h3>
+                        <p>{{ course.description or 'No description available.' }}</p>
+                    </div>
+
+                    <!-- Available Classes -->
+                    <div class="available-classes">
+                        <h3 class="h4 mb-3">Available Classes</h3>
+                        {% if course.classes.count() > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Class Name</th>
+                                            <th>Day</th>
+                                            <th>Time</th>
+                                            <th>Room</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for class in course.classes %}
+                                        <tr>
+                                            <td>{{ class.name }}</td>
+                                            <td>{{ class.day }}</td>
+                                            <td>{{ class.start_time.strftime('%I:%M %p') }} - {{ class.end_time.strftime('%I:%M %p') }}</td>
+                                            <td>{{ class.room }}</td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-primary">Enroll</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>No classes are currently available for this course.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .course-description {
+        line-height: 1.8;
+    }
+    
+    .table th {
+        font-weight: 600;
+    }
+</style>
+{% endblock %} 
