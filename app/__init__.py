@@ -9,9 +9,18 @@ from app.models.course import Course
 from app.models.enrollment import student_course_enrollments
 from sqlalchemy import text
 
+def ensure_upload_folder_exists(app):
+    """Ensure the upload folder exists and create it if it doesn't."""
+    upload_folder = app.config['UPLOAD_FOLDER']
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Ensure upload folder exists
+    ensure_upload_folder_exists(app)
 
     # Initialize extensions
     db.init_app(app)
