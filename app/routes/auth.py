@@ -59,8 +59,8 @@ def register():
     if form.validate_on_submit():
         # Enforce registration settings
         setting_key = f"registration_{form.role.data}"
-        setting = SystemSetting.query.get(setting_key)
-        if not setting or setting.value != 'enabled':
+        setting = SystemSetting.query.filter_by(setting_key=setting_key).first()
+        if not setting or setting.setting_value != 'enabled':
             flash(f'Registration for {form.role.data.capitalize()}s is currently disabled. Please contact the administrator.', 'danger')
             return redirect(url_for('auth.login'))
         
