@@ -30,8 +30,20 @@
     {% for course, students in course_students.items() %}
     <div class="card mb-4">
         <div class="card-header">
-            <h3 class="mb-0">{{ course.name }}</h3>
-            <p class="mb-0 text-muted">Number of students in this course: {{ students|length }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-0">{{ course.name }}</h3>
+                    <p class="mb-0 text-muted">Number of students in this course: {{ students|length }}</p>
+                </div>
+                <div class="btn-group">
+                    <a href="{{ url_for('lecturer.download_students', course_id=course.id) }}" class="btn btn-outline-primary">
+                        <i class="fas fa-download me-1"></i>Download Student List
+                    </a>
+                    <a href="{{ url_for('lecturer.download_grading_status', course_id=course.id) }}" class="btn btn-outline-success">
+                        <i class="fas fa-file-excel me-1"></i>Download Grading Status
+                    </a>
+                </div>
+            </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
