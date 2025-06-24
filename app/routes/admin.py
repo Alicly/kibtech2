@@ -1,11 +1,11 @@
+import os
+from datetime import datetime, time
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, send_file, make_response
 from flask_login import login_required, current_user
 from app import db
 from app.models import User, Course, ClassRoom, News, Event, Notification, LeadershipTeam, Student, SlideshowSlide, FeeStructure
 from app.forms.admin import CourseForm, ClassRoomForm, NewsForm, EventForm, UserForm, MaintenanceModeForm, HomepageSettingsForm, UnitForm, SlideshowSlideForm, SlideshowSlideEditForm
 from werkzeug.utils import secure_filename
-import os
-from datetime import datetime, time
 from functools import wraps
 from app.models.system_setting import SystemSetting
 import csv
@@ -13,6 +13,8 @@ from io import BytesIO, StringIO
 from xhtml2pdf import pisa
 from sqlalchemy import text
 from app.models.unit import Unit
+from werkzeug.datastructures import FileStorage
+from werkzeug.security import generate_password_hash
 
 bp = Blueprint('admin', __name__)
 
@@ -345,9 +347,16 @@ def edit_course(id):
         course.is_active = form.is_active.data
         
         # Handle image upload
-        if form.image.data:
-            filename = secure_filename(form.image.data.filename)
-            form.image.data.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        if form.image.data and isinstance(form.image.data, FileStorage):
+            # Create a unique filename to avoid overwriting
+            filename = secure_filename(f"{course.code}_{form.image.data.filename}")
+            # Ensure the upload folder exists
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            # Save the file
+            file_path = os.path.join(upload_folder, filename)
+            form.image.data.save(file_path)
             course.image_url = filename
         
         # Find and update all corresponding fee structures of type 'Tuition'
@@ -368,7 +377,7 @@ def edit_course(id):
                 description=f"Total tuition fee for {course.name}"
             )
             db.session.add(fee_structure)
-
+        
         db.session.commit()
         flash('Course has been updated successfully.', 'success')
         return redirect(url_for('admin.courses'))

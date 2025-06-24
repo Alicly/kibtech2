@@ -11,8 +11,10 @@ bp = Blueprint('main', __name__)
 @bp.route('/')
 @bp.route('/index')
 def index():
-    # Get featured courses (first 3 active courses)
-    featured_courses = Course.query.filter_by(is_active=True).limit(3).all()
+    # Get featured courses (prioritize courses with images)
+    featured_courses = Course.query.filter_by(is_active=True)\
+        .order_by(Course.image_url.desc().nullslast(), Course.created_at.desc())\
+        .limit(3).all()
     
     # Get latest news (first 3 published news)
     news = News.query.filter_by(is_published=True).order_by(News.date.desc()).limit(3).all()

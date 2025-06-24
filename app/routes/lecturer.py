@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, make_response
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, make_response, send_file
 from flask_login import login_required, current_user
 from app.models import Course, ClassRoom, Assignment, Grade, Attendance, TeachingMaterial, User, Unit, Student, Enrollment
 from app import db
 from datetime import datetime, timedelta
 import os
+import csv
+from io import StringIO, BytesIO
 
 bp = Blueprint('lecturer', __name__, url_prefix='/lecturer')
 
@@ -768,4 +770,116 @@ def my_students():
         
         course_students[course] = all_students
     
-    return render_template('lecturer/my_students.html', course_students=course_students, courses=courses) 
+    return render_template('lecturer/my_students.html', course_students=course_students, courses=courses)
+
+@bp.route('/download/students/<int:course_id>')
+@login_required
+def download_students(course_id):
+    """Download list of students for a specific course"""
+    course = Course.query.get_or_404(course_id)
+    
+    # Check if lecturer is assigned to this course
+    if course not in current_user.courses_teaching:
+        flash('Access denied. You are not assigned to this course.', 'danger')
+        return redirect(url_for('lecturer.my_students'))
+    
+    # Get students through many-to-many relationship (enrollments)
+    students_m2m = course.students.all()
+    
+    # Get students through direct relationship (course_id in students table)
+    students_direct = Student.query.filter_by(course_id=course.id).all()
+    
+    # Combine both lists and remove duplicates
+    students = list(students_m2m)
+    for student in students_direct:
+        if student not in students:
+            students.append(student)
+    
+    # Create CSV file
+    output = StringIO()
+    writer = csv.writer(output)
+    
+    # Write header
+    writer.writerow(['Registration Number', 'First Name', 'Last Name', 'Email', 'Phone', 'Status'])
+    
+    # Write student data
+    for student in students:
+        writer.writerow([
+            student.student_number,
+            student.first_name,
+            student.last_name,
+            student.email,
+            student.phone or 'N/A',
+            student.status
+        ])
+    
+    # Create response
+    output.seek(0)
+    # Convert to bytes for send_file
+    bytes_output = BytesIO()
+    bytes_output.write(output.getvalue().encode('utf-8'))
+    bytes_output.seek(0)
+    
+    return send_file(
+        bytes_output,
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name=f'{course.code}_students_{datetime.now().strftime("%Y%m%d")}.csv'
+    )
+
+@bp.route('/download/grading-status/<int:course_id>')
+@login_required
+def download_grading_status(course_id):
+    """Download grading status report for a specific course"""
+    course = Course.query.get_or_404(course_id)
+    
+    # Check if lecturer is assigned to this course
+    if course not in current_user.courses_teaching:
+        flash('Access denied. You are not assigned to this course.', 'danger')
+        return redirect(url_for('lecturer.my_students'))
+    
+    # Get all students
+    students_m2m = course.students.all()
+    students_direct = Student.query.filter_by(course_id=course.id).all()
+    students = list(students_m2m)
+    for student in students_direct:
+        if student not in students:
+            students.append(student)
+    
+    # Get all units
+    units = course.units.all()
+    
+    # Create CSV file
+    output = StringIO()
+    writer = csv.writer(output)
+    
+    # Write header
+    header = ['Registration Number', 'Student Name']
+    for unit in units:
+        header.append(f'{unit.code} - {unit.name}')
+    writer.writerow(header)
+    
+    # Write student data
+    for student in students:
+        row = [student.student_number, f'{student.first_name} {student.last_name}']
+        for unit in units:
+            grade = Grade.query.filter_by(student_id=student.id, unit_id=unit.id).first()
+            if grade:
+                row.append(f'{grade.score}%')
+            else:
+                row.append('Not Graded')
+        writer.writerow(row)
+    
+    # Create response
+    output.seek(0)
+    # Convert to bytes for send_file
+    bytes_output = BytesIO()
+    bytes_output.write(output.getvalue().encode('utf-8'))
+    bytes_output.seek(0)
+    
+    return send_file(
+        bytes_output,
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name=f'{course.code}_grading_status_{datetime.now().strftime("%Y%m%d")}.csv'
+    ) 
